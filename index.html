@@ -19,9 +19,9 @@
     --shadow: rgba(26,15,0,0.35);
     --faded: #5a4020;
   }
- 
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
- 
+
   body {
     background: #1a0f00;
     background-image:
@@ -31,7 +31,7 @@
     font-family: 'Crimson Text', Georgia, serif;
     color: var(--ink);
   }
- 
+
   /* Noise overlay */
   body::before {
     content: '';
@@ -40,9 +40,9 @@
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     background-size: 128px;
   }
- 
+
   #app { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 24px 16px 60px; }
- 
+
   /* Header */
   header {
     text-align: center;
@@ -65,7 +65,7 @@
     margin-top: 6px;
     font-size: 1.05rem;
   }
- 
+
   /* Character selector bar */
   #char-bar {
     background: rgba(245,230,200,0.06);
@@ -94,7 +94,7 @@
   .btn-dark:hover { background: #3a2200; border-color: var(--gold); }
   .btn-red { background: #5a0a0a; color: var(--parchment); border-color: var(--red); }
   .btn-red:hover { background: #7a1010; }
- 
+
   /* Sheet */
   .sheet {
     background: var(--parchment);
@@ -106,7 +106,7 @@
     box-shadow: 0 8px 40px rgba(0,0,0,0.7), inset 0 0 80px rgba(180,130,50,0.08);
     overflow: hidden;
   }
- 
+
   /* Sheet header */
   .sheet-header {
     background: linear-gradient(135deg, #2a1400, #1a0c00);
@@ -125,18 +125,25 @@
   }
   .sheet-header input:focus { border-bottom-color: var(--gold-light); }
   .sheet-header input::placeholder { color: rgba(245,230,200,0.3); }
- 
+
   /* Tabs */
   .tabs {
     display: flex;
     border-bottom: 2px solid var(--border);
     background: var(--parchment-dark);
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  .tabs::-webkit-scrollbar { display: none; }
   .tab {
     font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.1em;
     padding: 11px 20px; cursor: pointer; border: none; background: transparent;
     color: var(--faded); text-transform: uppercase; border-right: 1px solid var(--border-light);
     transition: all 0.15s; position: relative;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
   .tab:hover { color: var(--ink); background: var(--parchment-mid); }
   .tab.active { color: var(--red); background: var(--parchment); font-weight: 600; }
@@ -144,17 +151,17 @@
     content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px;
     background: var(--red);
   }
- 
+
   /* Tab content */
   .tab-pane { display: none; }
   .tab-pane.active { display: block; }
- 
+
   /* Grid layouts */
   .sheet-body { padding: 24px; }
   .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   .grid-main { display: grid; grid-template-columns: 260px 1fr 220px; gap: 20px; }
- 
+
   /* Sections */
   .section {
     border: 1px solid var(--border-light);
@@ -173,7 +180,7 @@
     text-align: center;
   }
   .section-body { padding: 14px 12px; background: var(--parchment); }
- 
+
   /* Stat boxes */
   .stat-box {
     border: 2px solid var(--border);
@@ -208,7 +215,7 @@
     padding: 2px 8px; border-radius: 2px; margin-top: 6px;
     display: inline-block;
   }
- 
+
   /* Skills */
   .skill-row {
     display: flex; align-items: center; gap: 8px;
@@ -221,7 +228,7 @@
   .skill-bonus { font-family: 'Cinzel', serif; font-size: 0.8rem; font-weight: 600; color: var(--red); min-width: 28px; text-align: right; }
   .skill-name { flex: 1; color: var(--ink); }
   .skill-attr { color: var(--faded); font-size: 0.78rem; font-style: italic; }
- 
+
   /* Combat stats */
   .combat-stat {
     border: 2px solid var(--border);
@@ -236,7 +243,7 @@
     width: 100%; text-align: center; background: transparent; border: none;
     border-bottom: 1px dashed var(--border-light); outline: none; color: var(--ink);
   }
- 
+
   /* Hit points */
   .hp-section {
     border: 2px solid var(--red);
@@ -252,7 +259,7 @@
     border-bottom: 1px dashed rgba(139,26,26,0.4); outline: none; color: var(--ink);
   }
   .hp-max-label { font-size: 0.8rem; color: var(--faded); font-style: italic; text-align: center; }
- 
+
   /* Death saves */
   .death-saves { display: flex; gap: 16px; align-items: center; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
   .save-row { display: flex; align-items: center; gap: 6px; }
@@ -260,7 +267,7 @@
   .die-box { width: 18px; height: 18px; border: 1px solid var(--border); border-radius: 3px; cursor: pointer; background: transparent; transition: all 0.15s; }
   .die-box.success-filled { background: #2d6a2d; border-color: #1a4a1a; }
   .die-box.failure-filled { background: var(--red); border-color: #5a0a0a; }
- 
+
   /* Attacks */
   .attack-row { display: grid; grid-template-columns: 1fr 80px 1fr; gap: 8px; margin-bottom: 8px; align-items: center; }
   .attack-row input {
@@ -271,11 +278,11 @@
   .attack-row input:focus { border-color: var(--gold); }
   .attack-row input::placeholder { color: rgba(90,64,32,0.5); }
   .attack-header { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faded); text-align: center; margin-bottom: 4px; }
- 
+
   /* Saving throws mini */
   .save-row-skill { display: flex; align-items: center; gap: 8px; padding: 2px 0; font-size: 0.88rem; }
   .save-bonus { font-family: 'Cinzel', serif; font-size: 0.78rem; font-weight: 600; color: var(--red); min-width: 26px; text-align: right; }
- 
+
   /* Textarea fields */
   .field-label { font-family: 'Cinzel', serif; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); margin-bottom: 5px; display: block; }
   textarea {
@@ -291,13 +298,13 @@
     font-size: 1rem; padding: 6px 10px; outline: none;
   }
   .field-input:focus { border-color: var(--gold); }
- 
+
   /* Currency */
   .currency-row { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; }
   .coin { text-align: center; }
   .coin label { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.1em; color: var(--faded); display: block; margin-bottom: 3px; }
   .coin input { font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: 600; text-align: center; width: 100%; background: var(--parchment-mid); border: 1px solid var(--border-light); border-radius: 3px; padding: 5px 2px; outline: none; color: var(--ink); }
- 
+
   /* Spell slots */
   .spell-level-row { display: grid; grid-template-columns: 60px 1fr; gap: 10px; align-items: start; margin-bottom: 12px; }
   .spell-level-badge { font-family: 'Cinzel', serif; font-size: 0.7rem; font-weight: 700; background: var(--border); color: var(--parchment); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
@@ -305,11 +312,11 @@
   .slot-pip { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 50%; cursor: pointer; background: transparent; transition: all 0.15s; }
   .slot-pip.used { background: var(--border); }
   .spells-list textarea { min-height: 60px; font-size: 0.9rem; }
- 
+
   /* Notes area */
   .notes-section { padding: 20px; }
   .notes-section .section { margin-bottom: 16px; }
- 
+
   /* Save indicator */
   #save-status {
     position: fixed; bottom: 20px; right: 20px;
@@ -319,7 +326,7 @@
     text-transform: uppercase; z-index: 100;
   }
   #save-status.show { opacity: 1; }
- 
+
   /* Responsive */
   @media (max-width: 768px) {
     .grid-main { grid-template-columns: 1fr; }
@@ -327,19 +334,19 @@
     .sheet-header { grid-template-columns: 1fr 1fr; }
     .tab { padding: 10px 12px; font-size: 0.65rem; }
   }
- 
+
   /* Ornamental divider */
   .ornament { text-align: center; color: var(--gold); font-size: 1.1rem; letter-spacing: 0.5em; margin: 12px 0; opacity: 0.6; }
- 
+
   /* Proficiency toggle */
   .prof-toggle { cursor: pointer; user-select: none; }
- 
+
   /* Scrollable pane */
   .scrollable { max-height: 70vh; overflow-y: auto; padding-right: 4px; }
   .scrollable::-webkit-scrollbar { width: 6px; }
   .scrollable::-webkit-scrollbar-track { background: var(--parchment-dark); }
   .scrollable::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
- 
+
   /* Character image placeholder */
   .char-portrait {
     width: 100%; aspect-ratio: 3/4; border: 2px solid var(--border);
@@ -353,14 +360,14 @@
   .char-portrait img { width: 100%; height: 100%; object-fit: cover; }
   .char-portrait input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
   .portrait-hint { font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; }
- 
+
   .skill-attr-toggle {
     color: var(--red); font-size: 0.78rem; font-style: italic;
     cursor: pointer; user-select: none; border-bottom: 1px dashed var(--red);
     transition: color 0.15s;
   }
   .skill-attr-toggle:hover { color: var(--gold); border-bottom-color: var(--gold); }
- 
+
   /* Dice roller */
   :root { --muddy-gold: #8B7322; --muddy-gold-light: #a08828; }
   .dice-tab { padding: 28px 24px; }
@@ -407,14 +414,14 @@
   }
   @keyframes rollPop { 0%{transform:scale(0.6) rotate(-10deg);opacity:0} 60%{transform:scale(1.15) rotate(3deg)} 100%{transform:scale(1) rotate(0);opacity:1} }
   .roll-pop { animation: rollPop 0.3s ease forwards; }
- 
+
   .passive-box {
     text-align: center; border: 2px solid var(--border); border-radius: 5px;
     padding: 8px; background: var(--parchment-mid);
   }
   .passive-box .val { font-family: 'Cinzel', serif; font-size: 1.8rem; font-weight: 700; color: var(--ink); }
   .passive-box label { font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faded); }
- 
+
   .inspiration-box {
     text-align: center; border: 2px solid var(--gold); border-radius: 5px;
     padding: 8px; background: var(--parchment-mid); cursor: pointer; transition: all 0.15s;
@@ -431,7 +438,7 @@
     <h1>⚔ Dungeons & Dragons ⚔</h1>
     <p>5th Edition Character Sheet</p>
   </header>
- 
+
   <!-- Character Management Bar -->
   <div id="char-bar">
     <label>Character:</label>
@@ -442,7 +449,7 @@
     <button class="btn btn-dark" onclick="importCharacter()">Import JSON</button>
     <button class="btn btn-red" onclick="deleteCharacter()">Delete</button>
   </div>
- 
+
   <!-- Sheet -->
   <div class="sheet">
     <!-- Sheet Header -->
@@ -468,7 +475,7 @@
         <input type="number" id="xp" placeholder="0" oninput="autosave()">
       </div>
     </div>
- 
+
     <!-- Tabs -->
     <div class="tabs">
       <button class="tab active" onclick="switchTab('main',this)">Stats</button>
@@ -479,7 +486,7 @@
       <button class="tab" onclick="switchTab('notes',this)">Notes</button>
       <button class="tab" onclick="switchTab('dice',this)">🎲 Dice</button>
     </div>
- 
+
     <!-- TAB: STATS -->
     <div id="tab-main" class="tab-pane active sheet-body">
       <div class="grid-main">
@@ -501,7 +508,7 @@
             </div>
           </div>
         </div>
- 
+
         <!-- Column 2: Saving Throws + Portrait -->
         <div>
           <div class="section" style="margin-bottom:16px">
@@ -540,7 +547,7 @@
             </div>
           </div>
         </div>
- 
+
         <!-- Column 3: Portrait + Other -->
         <div>
           <div class="section" style="margin-bottom:16px">
@@ -565,7 +572,7 @@
         </div>
       </div>
     </div>
- 
+
     <!-- TAB: COMBAT -->
     <div id="tab-combat" class="tab-pane sheet-body">
       <!-- Combat stats row -->
@@ -579,7 +586,7 @@
         <div class="combat-stat"><label>Current Hit Dice</label><input type="text" id="currentHitDice" placeholder="5d10" oninput="autosave()"></div>
         <div></div>
       </div>
- 
+
       <!-- HP -->
       <div class="grid-2" style="margin-bottom:20px">
         <div>
@@ -626,7 +633,7 @@
           </div>
         </div>
       </div>
- 
+
       <!-- Equipment -->
       <div class="section">
         <div class="section-title">Equipment & Inventory</div>
@@ -643,7 +650,7 @@
         </div>
       </div>
     </div>
- 
+
     <!-- TAB: SKILLS -->
     <div id="tab-skills" class="tab-pane sheet-body">
       <div class="grid-2">
@@ -669,7 +676,7 @@
         </div>
       </div>
     </div>
- 
+
     <!-- TAB: SPELLS -->
     <div id="tab-spells" class="tab-pane sheet-body">
       <div class="grid-3" style="margin-bottom:20px">
@@ -683,7 +690,7 @@
       </div>
       <div id="spell-levels-container"></div>
     </div>
- 
+
     <!-- TAB: BIO -->
     <div id="tab-bio" class="tab-pane sheet-body">
       <div class="grid-2" style="margin-bottom:20px">
@@ -744,7 +751,7 @@
         </div>
       </div>
     </div>
- 
+
     <!-- TAB: DICE -->
     <div id="tab-dice" class="tab-pane">
       <div class="dice-tab">
@@ -762,7 +769,7 @@
           </div>
           <div id="luckySection" style="display:none"></div>
         </div>
- 
+
         <!-- Dice buttons -->
         <div class="section" style="margin-bottom:20px">
           <div class="section-title">Choose a Die</div>
@@ -778,7 +785,7 @@
             </div>
           </div>
         </div>
- 
+
         <!-- Result -->
         <div class="grid-2" style="gap:16px">
           <div>
@@ -808,7 +815,7 @@
         </div>
       </div>
     </div>
- 
+
     <!-- TAB: NOTES -->
     <div id="tab-notes" class="tab-pane sheet-body">
       <div class="grid-2">
@@ -844,9 +851,9 @@
     </div>
   </div>
 </div>
- 
+
 <div id="save-status">✓ Saved</div>
- 
+
 <script>
 // ─── State ───────────────────────────────────────────────────────────────────
 const ABILITY_SCORES = ['Strength','Dexterity','Constitution','Intelligence','Wisdom','Charisma'];
@@ -867,11 +874,11 @@ let intimidationAttr = 'CHA';
 const SPELL_LEVELS = ['Cantrips','1st','2nd','3rd','4th','5th','6th','7th','8th','9th'];
 // Default max slots per level (index 0 = cantrips, no slots)
 let MAX_SLOTS = [0,4,3,3,3,3,2,2,1,1];
- 
+
 let currentId = null;
 let saveTimer = null;
 let inspiration = false;
- 
+
 // ─── Init ────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   buildAbilityScores();
@@ -883,7 +890,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadCharacterList();
   updateAll();
 });
- 
+
 // ─── Build UI Components ─────────────────────────────────────────────────────
 function buildAbilityScores() {
   const grid = document.getElementById('stats-grid');
@@ -899,7 +906,7 @@ function buildAbilityScores() {
       </div>`;
   }).join('');
 }
- 
+
 function buildSavingThrows() {
   const list = document.getElementById('saving-throws-list');
   list.innerHTML = ABILITY_SCORES.map((name, i) => {
@@ -911,7 +918,7 @@ function buildSavingThrows() {
     </div>`;
   }).join('');
 }
- 
+
 function buildSkills() {
   const list = document.getElementById('skills-list');
   list.innerHTML = SKILLS_LIST.map((s, i) => {
@@ -926,7 +933,7 @@ function buildSkills() {
     </div>`;
   }).join('');
 }
- 
+
 function toggleIntimidation() {
   const intimidIdx = SKILLS_LIST.findIndex(s => s.toggleable);
   intimidationAttr = intimidationAttr === 'CHA' ? 'STR' : 'CHA';
@@ -936,7 +943,7 @@ function toggleIntimidation() {
   updateAll();
   autosave();
 }
- 
+
 function buildDeathSaves() {
   const suc = document.getElementById('death-success');
   const fail = document.getElementById('death-fail');
@@ -945,12 +952,12 @@ function buildDeathSaves() {
     fail.innerHTML += `<div class="die-box" id="df_${i}" onclick="toggleDeath('fail',${i})"></div>`;
   }
 }
- 
+
 function buildAttacks() {
   const list = document.getElementById('attacks-list');
   if(!list.children.length) addAttack();
 }
- 
+
 function addAttack() {
   const list = document.getElementById('attacks-list');
   const idx = list.children.length;
@@ -963,7 +970,7 @@ function addAttack() {
     <input type="text" placeholder="1d8+3 slashing" oninput="autosave()">`;
   list.appendChild(row);
 }
- 
+
 function buildSpellLevels() {
   const container = document.getElementById('spell-levels-container');
   container.innerHTML = '';
@@ -995,7 +1002,7 @@ function buildSpellLevels() {
       </div>`;
   });
 }
- 
+
 function updateSlotPips(lvl) {
   const input = document.getElementById('maxslot_'+lvl);
   const newCount = Math.max(0, Math.min(9, parseInt(input.value)||0));
@@ -1007,13 +1014,13 @@ function updateSlotPips(lvl) {
   container.innerHTML = Array.from({length:newCount},(_,j)=>`
     <div class="slot-pip${prevUsed[j]?' used':''}" id="slot_${lvl}_${j}" onclick="toggleSlot(${lvl},${j})"></div>`).join('');
 }
- 
+
 // ─── Calculations ─────────────────────────────────────────────────────────────
 function getMod(score) { return Math.floor((score - 10) / 2); }
 function fmtMod(m) { return (m >= 0 ? '+' : '') + m; }
 function getScore(abbr) { return parseInt(document.getElementById('score_'+abbr)?.value) || 10; }
 function getProfBonus() { return parseInt(document.getElementById('profBonus')?.value) || 2; }
- 
+
 function updateAll() {
   const prof = getProfBonus();
   ABILITY_ABBR.forEach(abbr => {
@@ -1022,7 +1029,7 @@ function updateAll() {
     const modEl = document.getElementById('mod_'+abbr);
     if(modEl) modEl.textContent = fmtMod(mod);
   });
- 
+
   // Saving throws
   ABILITY_ABBR.forEach(abbr => {
     const mod = getMod(getScore(abbr));
@@ -1032,7 +1039,7 @@ function updateAll() {
     const bonusEl = document.getElementById('save_bonus_'+abbr);
     if(bonusEl) bonusEl.textContent = fmtMod(bonus);
   });
- 
+
   // Skills
   SKILLS_LIST.forEach((s, i) => {
     const mod = getMod(getScore(s.attr));
@@ -1042,7 +1049,7 @@ function updateAll() {
     const bonusEl = document.getElementById('skill_bonus_'+i);
     if(bonusEl) bonusEl.textContent = fmtMod(bonus);
   });
- 
+
   // Passive perception
   const percIdx = SKILLS_LIST.findIndex(s=>s.name==='Perception');
   const percMod = getMod(getScore('WIS'));
@@ -1051,7 +1058,7 @@ function updateAll() {
   const ppEl = document.getElementById('passivePerc');
   if(ppEl) ppEl.textContent = passivePerc;
 }
- 
+
 function toggleSaveProf(abbr) {
   document.getElementById('save_prof_'+abbr)?.classList.toggle('proficient');
   updateAll(); autosave();
@@ -1080,7 +1087,7 @@ function toggleSlot(lvl, idx) {
   document.getElementById('slot_'+lvl+'_'+idx)?.classList.toggle('used');
   autosave();
 }
- 
+
 // ─── Portrait ────────────────────────────────────────────────────────────────
 function uploadPortrait(e) {
   const file = e.target.files[0];
@@ -1096,7 +1103,7 @@ function uploadPortrait(e) {
   };
   reader.readAsDataURL(file);
 }
- 
+
 // ─── Save / Load ─────────────────────────────────────────────────────────────
 function getCharacterData() {
   const data = {};
@@ -1115,32 +1122,32 @@ function getCharacterData() {
     const el = document.getElementById(id);
     if(el) data[id] = el.value;
   });
- 
+
   // Spell textareas
   SPELL_LEVELS.forEach((_,i) => {
     const el = document.getElementById('spells_'+i);
     if(el) data['spells_'+i] = el.value;
   });
- 
+
   // Ability scores
   ABILITY_ABBR.forEach(abbr => {
     const el = document.getElementById('score_'+abbr);
     if(el) data['score_'+abbr] = el.value;
   });
- 
+
   // Saving throw profs
   data.saveProfs = ABILITY_ABBR.filter(a => document.getElementById('save_prof_'+a)?.classList.contains('proficient'));
- 
+
   // Skill profs
   data.skillProfs = SKILLS_LIST.map((_,i) => document.getElementById('skill_prof_'+i)?.classList.contains('proficient'));
- 
+
   // Inspiration
   data.inspiration = inspiration;
- 
+
   // Death saves
   data.deathSuccess = [0,1,2].map(i => document.getElementById('ds_'+i)?.classList.contains('success-filled'));
   data.deathFail = [0,1,2].map(i => document.getElementById('df_'+i)?.classList.contains('failure-filled'));
- 
+
   data.intimidationAttr = intimidationAttr;
   // Spell slots
   data.spellSlots = {};
@@ -1150,21 +1157,21 @@ function getCharacterData() {
     data.maxSlots[lvl] = MAX_SLOTS[lvl];
     data.spellSlots[lvl] = Array.from({length:MAX_SLOTS[lvl]},(_,j) => document.getElementById('slot_'+lvl+'_'+j)?.classList.contains('used'));
   });
- 
+
   // Attacks
   const attackRows = document.querySelectorAll('#attacks-list .attack-row');
   data.attacks = Array.from(attackRows).map(row => {
     const inputs = row.querySelectorAll('input');
     return {name: inputs[0]?.value, bonus: inputs[1]?.value, damage: inputs[2]?.value};
   });
- 
+
   // Portrait
   const img = document.getElementById('portrait-img');
   data.portrait = img?.style.display !== 'none' ? img?.src : '';
- 
+
   return data;
 }
- 
+
 function applyCharacterData(data) {
   if(!data) return;
   ['charName','race','classLevel','background','playerName','alignment','xp',
@@ -1181,38 +1188,38 @@ function applyCharacterData(data) {
     const el = document.getElementById(id);
     if(el && data[id] !== undefined) el.value = data[id];
   });
- 
+
   SPELL_LEVELS.forEach((_,i) => {
     const el = document.getElementById('spells_'+i);
     if(el && data['spells_'+i] !== undefined) el.value = data['spells_'+i];
   });
- 
+
   ABILITY_ABBR.forEach(abbr => {
     const el = document.getElementById('score_'+abbr);
     if(el && data['score_'+abbr] !== undefined) el.value = data['score_'+abbr];
   });
- 
+
   // Save profs
   ABILITY_ABBR.forEach(abbr => {
     const el = document.getElementById('save_prof_'+abbr);
     if(el) el.classList.toggle('proficient', (data.saveProfs||[]).includes(abbr));
   });
- 
+
   // Skill profs
   (data.skillProfs||[]).forEach((val, i) => {
     const el = document.getElementById('skill_prof_'+i);
     if(el) el.classList.toggle('proficient', !!val);
   });
- 
+
   // Inspiration
   inspiration = !!data.inspiration;
   document.getElementById('inspirationBox')?.classList.toggle('active', inspiration);
   updateInspirationLabel();
- 
+
   // Death saves
   (data.deathSuccess||[]).forEach((v,i) => document.getElementById('ds_'+i)?.classList.toggle('success-filled',!!v));
   (data.deathFail||[]).forEach((v,i) => document.getElementById('df_'+i)?.classList.toggle('failure-filled',!!v));
- 
+
   // Restore intimidation attr
   if(data.intimidationAttr) {
     intimidationAttr = data.intimidationAttr;
@@ -1234,7 +1241,7 @@ function applyCharacterData(data) {
       (slots||[]).forEach((used, j) => document.getElementById('slot_'+lvl+'_'+j)?.classList.toggle('used',!!used));
     });
   }
- 
+
   // Attacks
   const list = document.getElementById('attacks-list');
   list.innerHTML = '';
@@ -1247,7 +1254,7 @@ function applyCharacterData(data) {
       <input type="text" value="${atk.damage||''}" placeholder="1d8+3 slashing" oninput="autosave()">`;
     list.appendChild(row);
   });
- 
+
   // Portrait
   if(data.portrait) {
     const img = document.getElementById('portrait-img');
@@ -1259,10 +1266,10 @@ function applyCharacterData(data) {
     document.getElementById('portrait-img').style.display = 'none';
     document.getElementById('portrait-placeholder').style.display = '';
   }
- 
+
   updateAll();
 }
- 
+
 function saveCharacter() {
   const data = getCharacterData();
   const name = data.charName || 'Unnamed Character';
@@ -1273,7 +1280,7 @@ function saveCharacter() {
   loadCharacterList();
   showSaved();
 }
- 
+
 function loadCharacterList() {
   const sel = document.getElementById('char-select');
   const prev = currentId;
@@ -1287,7 +1294,7 @@ function loadCharacterList() {
     sel.appendChild(opt);
   });
 }
- 
+
 function loadCharacter() {
   const sel = document.getElementById('char-select');
   currentId = sel.value || null;
@@ -1296,13 +1303,13 @@ function loadCharacter() {
   const char = characters[currentId];
   if(char) applyCharacterData(char.data);
 }
- 
+
 function newCharacter() {
   currentId = null;
   document.getElementById('char-select').value = '';
   resetSheet();
 }
- 
+
 function resetSheet() {
   ['charName','race','classLevel','background','playerName','alignment','xp',
    'profBonus','ac','initiative','speed','hitDice','currentHitDice',
@@ -1350,7 +1357,7 @@ function resetSheet() {
   document.getElementById('portrait-placeholder').style.display = '';
   updateAll();
 }
- 
+
 function deleteCharacter() {
   if(!currentId) return;
   if(!confirm('Delete this character? This cannot be undone.')) return;
@@ -1361,7 +1368,7 @@ function deleteCharacter() {
   loadCharacterList();
   resetSheet();
 }
- 
+
 function exportCharacter() {
   const data = getCharacterData();
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
@@ -1370,7 +1377,7 @@ function exportCharacter() {
   a.download = (data.charName || 'character') + '.json';
   a.click();
 }
- 
+
 function importCharacter() {
   const input = document.createElement('input');
   input.type = 'file';
@@ -1391,23 +1398,23 @@ function importCharacter() {
   };
   input.click();
 }
- 
+
 // Autosave debounce
 function autosave() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(saveCharacter, 1500);
 }
- 
+
 function showSaved() {
   const el = document.getElementById('save-status');
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 1800);
 }
- 
+
 // ─── Dice Roller ─────────────────────────────────────────────────────────────
 let luckyMode = false;
 let rollHistoryArr = [];
- 
+
 function rollDie(sides) {
   const modifier = parseInt(document.getElementById('diceModifier')?.value) || 0;
   let raw;
@@ -1419,7 +1426,7 @@ function rollDie(sides) {
     raw = 1 + Math.floor(Math.random() * sides);
   }
   const total = raw + modifier;
- 
+
   const display = document.getElementById('rollDisplay');
   const label = document.getElementById('rollLabel');
   if(display) {
@@ -1436,17 +1443,17 @@ function rollDie(sides) {
   else if(raw === 1) desc += ' — Fumble ✗';
   if(modifier !== 0) desc += ' (' + raw + ' ' + (modifier >= 0 ? '+' : '') + modifier + ')';
   if(label) label.textContent = desc;
- 
+
   rollHistoryArr.unshift({sides, raw, total, modifier});
   if(rollHistoryArr.length > 30) rollHistoryArr.pop();
   renderHistory();
 }
- 
+
 function clearHistory() {
   rollHistoryArr = [];
   renderHistory();
 }
- 
+
 function renderHistory() {
   const el = document.getElementById('rollHistory');
   if(!el) return;
@@ -1457,7 +1464,7 @@ function renderHistory() {
     '<span class="rh-val">' + r.total + (r.modifier!==0?' ('+r.raw+(r.modifier>=0?'+':'')+r.modifier+')':'') + '</span>' +
     '</div>').join('');
 }
- 
+
 // ── Lucky Mode ───────────────────────────────────────────────────────────────
 // Triple-click any die button within 1.2s to toggle. No UI hints anywhere.
 let _lct = []; // click timestamps
@@ -1473,7 +1480,7 @@ document.addEventListener('DOMContentLoaded', () => {
     b.addEventListener('click', _lcheck);
   });
 });
- 
+
 function enableLucky() {
   luckyMode = true;
   document.querySelectorAll('.die-btn').forEach(b => {
@@ -1488,7 +1495,7 @@ function disableLucky() {
     b.style.boxShadow = '';
   });
 }
- 
+
 // ─── Tab switching ────────────────────────────────────────────────────────────
 function switchTab(name, btn) {
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
