@@ -1469,20 +1469,18 @@ function renderHistory() {
 // ON:  click d4 → d6 → d8 in sequence within 1.5s
 // OFF: click d8 → d6 → d4 in sequence within 1.5s
 let _lseq = []; // {sides, time}
-const _ON  = [4, 6, 8];
-const _OFF = [8, 6, 4];
+const _ON  = [10, 20, 100];
+const _OFF = [100, 20, 10];
 function _ltrack(sides) {
   const now = Date.now();
   _lseq.push({sides, now});
-  // Drop entries older than 1.5s
   _lseq = _lseq.filter(e => now - e.now < 1500);
-  // Only keep last 3
   if(_lseq.length > 3) _lseq = _lseq.slice(-3);
   const seq = _lseq.map(e => e.sides);
   if(seq.length === 3) {
-    if(!luckyMode && seq[0]===4 && seq[1]===6 && seq[2]===8) {
+    if(!luckyMode && seq[0]===10 && seq[1]===20 && seq[2]===100) {
       _lseq = []; enableLucky();
-    } else if(luckyMode && seq[0]===8 && seq[1]===6 && seq[2]===4) {
+    } else if(luckyMode && seq[0]===100 && seq[1]===20 && seq[2]===10) {
       _lseq = []; disableLucky();
     }
   }
