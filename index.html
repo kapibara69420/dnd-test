@@ -775,13 +775,13 @@
           <div class="section-title">Choose a Die</div>
           <div class="section-body">
             <div class="dice-grid" id="diceGrid">
-              <button class="die-btn" onclick="rollDie(4)"><span class="die-icon">◆</span>d4</button>
-              <button class="die-btn" onclick="rollDie(6)"><span class="die-icon">⬡</span>d6</button>
-              <button class="die-btn" onclick="rollDie(8)"><span class="die-icon">◈</span>d8</button>
-              <button class="die-btn" onclick="rollDie(10)"><span class="die-icon">◉</span>d10</button>
-              <button class="die-btn" onclick="rollDie(12)"><span class="die-icon">✦</span>d12</button>
-              <button class="die-btn" onclick="rollDie(20)"><span class="die-icon">⬟</span>d20</button>
-              <button class="die-btn" onclick="rollDie(100)"><span class="die-icon">⊕</span>d100</button>
+              <button class="die-btn" data-sides="4" onclick="rollDie(4)"><span class="die-icon">◆</span>d4</button>
+              <button class="die-btn" data-sides="6" onclick="rollDie(6)"><span class="die-icon">⬡</span>d6</button>
+              <button class="die-btn" data-sides="8" onclick="rollDie(8)"><span class="die-icon">◈</span>d8</button>
+              <button class="die-btn" data-sides="10" onclick="rollDie(10)"><span class="die-icon">◉</span>d10</button>
+              <button class="die-btn" data-sides="12" onclick="rollDie(12)"><span class="die-icon">✦</span>d12</button>
+              <button class="die-btn" data-sides="20" onclick="rollDie(20)"><span class="die-icon">⬟</span>d20</button>
+              <button class="die-btn" data-sides="100" onclick="rollDie(100)"><span class="die-icon">⊕</span>d100</button>
             </div>
           </div>
         </div>
@@ -1466,18 +1466,31 @@ function renderHistory() {
 }
 
 // ── Lucky Mode ───────────────────────────────────────────────────────────────
-// Triple-click any die button within 1.2s to toggle. No UI hints anywhere.
-let _lct = []; // click timestamps
-function _lcheck() {
+// ON:  click d4 → d6 → d8 in sequence within 1.5s
+// OFF: click d8 → d6 → d4 in sequence within 1.5s
+let _lseq = []; // {sides, time}
+const _ON  = [4, 6, 8];
+const _OFF = [8, 6, 4];
+function _ltrack(sides) {
   const now = Date.now();
-  _lct.push(now);
-  _lct = _lct.filter(t => now - t < 1200);
-  if(_lct.length >= 3) { _lct = []; luckyMode ? disableLucky() : enableLucky(); }
+  _lseq.push({sides, now});
+  // Drop entries older than 1.5s
+  _lseq = _lseq.filter(e => now - e.now < 1500);
+  // Only keep last 3
+  if(_lseq.length > 3) _lseq = _lseq.slice(-3);
+  const seq = _lseq.map(e => e.sides);
+  if(seq.length === 3) {
+    if(!luckyMode && seq[0]===4 && seq[1]===6 && seq[2]===8) {
+      _lseq = []; enableLucky();
+    } else if(luckyMode && seq[0]===8 && seq[1]===6 && seq[2]===4) {
+      _lseq = []; disableLucky();
+    }
+  }
 }
-// Patch each die button to also call _lcheck
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.die-btn').forEach(b => {
-    b.addEventListener('click', _lcheck);
+    const sides = parseInt(b.getAttribute('data-sides'));
+    if(sides) b.addEventListener('click', () => _ltrack(sides));
   });
 });
 
