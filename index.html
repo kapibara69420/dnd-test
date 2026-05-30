@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>D&D 5E Character Sheet</title>
+<title>D&D 5E — Character Sheet & DM Screen</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -93,6 +93,17 @@
   .btn-dark { background: #2a1800; color: var(--parchment); border-color: var(--border); }
   .btn-dark:hover { background: #3a2200; border-color: var(--gold); }
   .btn-red { background: #5a0a0a; color: var(--parchment); border-color: var(--red); }
+
+  /* Mode switcher */
+  .mode-btn {
+    font-family: 'Cinzel', serif; font-size: 0.78rem; letter-spacing: 0.1em;
+    padding: 9px 28px; border: 1px solid var(--border); background: rgba(245,230,200,0.06);
+    color: var(--border-light); cursor: pointer; text-transform: uppercase; transition: all 0.15s;
+  }
+  .mode-btn:first-child { border-radius: 4px 0 0 4px; border-right: none; }
+  .mode-btn:last-child  { border-radius: 0 4px 4px 0; }
+  .mode-btn.active { background: var(--gold); color: #1a0800; border-color: var(--gold-light); font-weight: 600; }
+  .mode-btn:not(.active):hover { background: rgba(245,230,200,0.12); color: var(--parchment); }
   .btn-red:hover { background: #7a1010; }
 
   /* Sheet */
@@ -131,12 +142,19 @@
     display: flex;
     border-bottom: 2px solid var(--border);
     background: var(--parchment-dark);
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  .tabs::-webkit-scrollbar { display: none; }
   .tab {
     font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.1em;
     padding: 11px 20px; cursor: pointer; border: none; background: transparent;
     color: var(--faded); text-transform: uppercase; border-right: 1px solid var(--border-light);
     transition: all 0.15s; position: relative;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
   .tab:hover { color: var(--ink); background: var(--parchment-mid); }
   .tab.active { color: var(--red); background: var(--parchment); font-weight: 600; }
@@ -153,7 +171,7 @@
   .sheet-body { padding: 24px; }
   .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .grid-main { display: grid; grid-template-columns: 180px 1fr 220px; gap: 20px; }
+  .grid-main { display: grid; grid-template-columns: 260px 1fr 220px; gap: 20px; }
 
   /* Sections */
   .section {
@@ -354,6 +372,60 @@
   .char-portrait input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
   .portrait-hint { font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; }
 
+  .skill-attr-toggle {
+    color: var(--red); font-size: 0.78rem; font-style: italic;
+    cursor: pointer; user-select: none; border-bottom: 1px dashed var(--red);
+    transition: color 0.15s;
+  }
+  .skill-attr-toggle:hover { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* Dice roller */
+  :root { --muddy-gold: #8B7322; --muddy-gold-light: #a08828; }
+  .dice-tab { padding: 28px 24px; }
+  .dice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 14px; margin-bottom: 28px; }
+  .die-btn {
+    background: linear-gradient(145deg, #2a1800, #1a0c00);
+    border: 2px solid var(--border); border-radius: 8px;
+    color: var(--muddy-gold); font-family: 'Cinzel', serif;
+    font-size: 1.1rem; font-weight: 700; padding: 18px 8px;
+    cursor: pointer; transition: all 0.2s; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .die-btn:hover { border-color: var(--muddy-gold-light); color: var(--muddy-gold-light); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.5); }
+  .die-btn:active { transform: translateY(0); }
+  .die-btn .die-icon { font-size: 1.8rem; display: block; margin-bottom: 4px; color: var(--muddy-gold); transition: color 0.2s; }
+  .die-btn:hover .die-icon { color: var(--muddy-gold-light); }
+  /* Lucky active state — barely different, just slightly warmer */
+  .die-btn.lucky-active { color: var(--gold-light); }
+  .die-btn.lucky-active .die-icon { color: var(--gold-light); }
+  .roll-result {
+    text-align: center; padding: 24px;
+    border: 2px solid var(--border); border-radius: 8px;
+    background: var(--parchment-mid); margin-bottom: 20px; min-height: 110px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  }
+  .roll-number {
+    font-family: 'Cinzel', serif; font-size: 4rem; font-weight: 900;
+    color: var(--red); line-height: 1; transition: all 0.2s;
+  }
+  .roll-number.crit { color: #1a6b1a; }
+  .roll-number.fumble { color: #8b1a1a; }
+  .roll-label { font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--faded); }
+  .roll-history { max-height: 180px; overflow-y: auto; }
+  .roll-history-item { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; border-bottom: 1px solid rgba(107,76,17,0.2); font-size: 0.9rem; }
+  .roll-history-item:last-child { border-bottom: none; }
+  .roll-history-item .rh-die { font-family: 'Cinzel', serif; font-size: 0.78rem; color: var(--faded); }
+  .roll-history-item .rh-val { font-family: 'Cinzel', serif; font-weight: 700; color: var(--red); }
+  .modifier-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .modifier-row label { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faded); white-space: nowrap; }
+  .modifier-row input[type=number] {
+    width: 70px; font-family: 'Cinzel', serif; font-size: 0.95rem; font-weight: 700;
+    text-align: center; background: var(--parchment-mid); border: 1px solid var(--border-light);
+    border-radius: 3px; padding: 4px 6px; outline: none; color: var(--ink);
+  }
+  @keyframes rollPop { 0%{transform:scale(0.6) rotate(-10deg);opacity:0} 60%{transform:scale(1.15) rotate(3deg)} 100%{transform:scale(1) rotate(0);opacity:1} }
+  .roll-pop { animation: rollPop 0.3s ease forwards; }
+
   .passive-box {
     text-align: center; border: 2px solid var(--border); border-radius: 5px;
     padding: 8px; background: var(--parchment-mid);
@@ -369,15 +441,171 @@
   .inspiration-box label { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faded); cursor: pointer; }
   .inspiration-box.active label { color: var(--ink); }
   .inspiration-box .star { font-size: 1.5rem; line-height: 1; }
+
+  /* ── DM Screen ─────────────────────────────────────────────────────────── */
+  #dm-screen { display: none; }
+  #dm-screen.active { display: block; }
+  #player-screen.hidden { display: none; }
+
+  .dm-bar {
+    background: rgba(139,26,26,0.12); border: 1px solid var(--red);
+    border-radius: 4px; padding: 14px 18px; margin-bottom: 24px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+  .dm-bar label { color: #c44; font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; }
+  .dm-bar select {
+    background: #2a0a0a; color: var(--parchment); border: 1px solid var(--red);
+    padding: 6px 10px; border-radius: 3px; font-family: 'Crimson Text', serif; font-size: 1rem; flex: 1; min-width: 120px;
+  }
+
+  .dm-sheet {
+    background: var(--parchment);
+    background-image: linear-gradient(170deg, #f8ebd0 0%, #f2e0b8 40%, #ede0bc 100%);
+    border: 2px solid var(--red); border-radius: 6px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.7), inset 0 0 80px rgba(139,26,26,0.04);
+    overflow: hidden;
+  }
+  .dm-sheet-header {
+    background: linear-gradient(135deg, #2a0505, #1a0000);
+    padding: 18px 24px; border-bottom: 3px double var(--red);
+  }
+  .dm-sheet-header h2 {
+    font-family: 'Cinzel', serif; font-size: 1.4rem; font-weight: 900;
+    color: #c44; letter-spacing: 0.15em; text-transform: uppercase;
+  }
+  .dm-sheet-header p { color: rgba(245,220,200,0.5); font-style: italic; font-size: 0.9rem; margin-top: 4px; }
+
+  .dm-tabs {
+    display: flex; border-bottom: 2px solid var(--red);
+    background: #f0d8b8; overflow-x: auto; overflow-y: hidden;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  }
+  .dm-tabs::-webkit-scrollbar { display: none; }
+  .dm-tab {
+    font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.1em;
+    padding: 11px 18px; cursor: pointer; border: none; background: transparent;
+    color: var(--faded); text-transform: uppercase; border-right: 1px solid rgba(139,26,26,0.2);
+    transition: all 0.15s; position: relative; flex-shrink: 0; white-space: nowrap;
+  }
+  .dm-tab:hover { color: var(--ink); background: #e8d0a8; }
+  .dm-tab.active { color: var(--red); background: var(--parchment); font-weight: 600; }
+  .dm-tab.active::after { content:''; position:absolute; bottom:-2px; left:0; right:0; height:2px; background:var(--red); }
+
+  .dm-body { padding: 24px; }
+
+  /* Monster stat blocks */
+  .monster-card {
+    border: 2px solid var(--red); border-radius: 6px; overflow: hidden;
+    margin-bottom: 16px; background: var(--parchment);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .monster-header {
+    background: linear-gradient(90deg, var(--red), #6b0a0a);
+    padding: 10px 16px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .monster-header h3 { font-family: 'Cinzel', serif; font-size: 1rem; font-weight: 700; color: var(--parchment); }
+  .monster-header .monster-type { font-family: 'Crimson Text', serif; font-style: italic; color: rgba(245,230,200,0.75); font-size: 0.9rem; }
+  .monster-body { padding: 14px 16px; }
+  .monster-stats { display: grid; grid-template-columns: repeat(6,1fr); gap: 6px; margin-bottom: 12px; }
+  .monster-stat { text-align: center; background: var(--parchment-mid); border-radius: 3px; padding: 6px 4px; }
+  .monster-stat label { font-family: 'Cinzel', serif; font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faded); display: block; }
+  .monster-stat input { font-family: 'Cinzel', serif; font-size: 1rem; font-weight: 700; width: 100%; text-align: center; background: transparent; border: none; outline: none; color: var(--ink); border-bottom: 1px dashed var(--border-light); }
+  .monster-field { margin-bottom: 8px; }
+  .monster-field label { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red); display: block; margin-bottom: 3px; }
+  .monster-field input, .monster-field textarea {
+    width: 100%; background: var(--parchment); border: 1px solid var(--border-light);
+    border-radius: 3px; color: var(--ink); font-family: 'Crimson Text', serif; font-size: 0.95rem;
+    padding: 5px 8px; outline: none;
+  }
+  .monster-field textarea { resize: vertical; }
+  .monster-del-btn {
+    background: rgba(0,0,0,0.35); border: 1px solid rgba(245,220,200,0.55);
+    color: rgba(245,220,200,0.9);
+    font-family: 'Cinzel', serif; font-size: 0.65rem; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 3px; cursor: pointer; transition: all 0.15s;
+  }
+  .monster-del-btn:hover { background: #fff; color: var(--red); border-color: #fff; }
+
+  /* Initiative tracker */
+  .init-row {
+    display: grid; grid-template-columns: 48px 1fr 60px 60px 48px; gap: 8px;
+    align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(107,76,17,0.2);
+  }
+  .init-row:last-child { border-bottom: none; }
+  .init-row.current-turn { background: rgba(184,134,11,0.12); border-radius: 3px; padding: 6px 8px; margin: 0 -8px; }
+  .init-input {
+    font-family: 'Cinzel', serif; font-size: 1rem; font-weight: 700;
+    text-align: center; background: var(--parchment-mid); border: 1px solid var(--border-light);
+    border-radius: 3px; padding: 4px; outline: none; color: var(--ink); width: 100%;
+  }
+  .init-name { font-family: 'Crimson Text', serif; font-size: 1rem; }
+  .init-hp { font-family: 'Cinzel', serif; font-size: 0.85rem; text-align: center; }
+
+  /* Drag-to-reorder handles */
+  .card-handle {
+    cursor: grab; color: rgba(107,76,17,0.5); font-size: 1rem; padding: 0 6px;
+    user-select: none; line-height: 1; align-self: center;
+  }
+  .card-handle:active { cursor: grabbing; }
+  .card-dragging { opacity: 0.4; }
+  .card-drag-over { border-top: 3px solid var(--gold) !important; }
+
+  /* Collapse toggle */
+  .card-collapse-btn {
+    background: transparent; border: none; cursor: pointer;
+    font-size: 0.75rem; color: var(--faded); padding: 0 4px;
+    transition: transform 0.2s; line-height: 1; align-self: center;
+  }
+  .card-collapse-btn.open { transform: rotate(0deg); }
+  .card-collapse-btn.closed { transform: rotate(-90deg); }
+  .card-collapsible-body { overflow: hidden; transition: max-height 0.25s ease, padding 0.2s; }
+
+  /* NPC cards */
+  .npc-card { border: 1px solid var(--border-light); border-radius: 5px; padding: 14px; margin-bottom: 12px; background: var(--parchment-mid); }
+  .npc-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .npc-card-header h4 { font-family: 'Cinzel', serif; font-size: 0.9rem; font-weight: 700; color: var(--ink); }
+
+  /* Collapsible */
+  .collapsible-header { cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; }
+  .collapsible-header::after { content: '▼'; font-size: 0.6rem; color: var(--faded); transition: transform 0.2s; }
+  .collapsible-header.collapsed::after { transform: rotate(-90deg); }
+  .collapsible-body { overflow: hidden; transition: max-height 0.25s ease; }
+
+  /* DM-specific field inputs */
+  .dm-input {
+    width: 100%; background: var(--parchment); border: 1px solid var(--border-light);
+    border-radius: 3px; color: var(--ink); font-family: 'Crimson Text', serif;
+    font-size: 1rem; padding: 6px 10px; outline: none;
+  }
+  .dm-input:focus { border-color: var(--red); }
+  .dm-textarea {
+    width: 100%; background: var(--parchment); border: 1px solid var(--border-light);
+    border-radius: 3px; color: var(--ink); font-family: 'Crimson Text', serif;
+    font-size: 0.95rem; padding: 8px 10px; resize: vertical; outline: none; line-height: 1.5;
+  }
+  .dm-textarea:focus { border-color: var(--red); }
+  .dm-label { font-family: 'Cinzel', serif; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); margin-bottom: 5px; display: block; }
+  .hp-bar-wrap { background: #c0a060; border-radius: 3px; height: 8px; overflow: hidden; margin-top: 4px; }
+  .hp-bar-fill { height: 100%; background: var(--red); border-radius: 3px; transition: width 0.3s; }
+
+  @media (max-width: 768px) {
+    .monster-stats { grid-template-columns: repeat(3,1fr); }
+    .init-row { grid-template-columns: 42px 1fr 52px 52px 36px; gap: 5px; }
+  }
 </style>
 </head>
 <body>
 <div id="app">
   <header>
     <h1>⚔ Dungeons & Dragons ⚔</h1>
-    <p>5th Edition Character Sheet</p>
+    <div style="display:flex;justify-content:center;gap:0;margin-top:14px">
+      <button id="modePlayer" class="mode-btn active" onclick="setMode('player')">⚔ Player</button>
+      <button id="modeDM" class="mode-btn" onclick="setMode('dm')">🐉 Dungeon Master</button>
+    </div>
   </header>
 
+  <div id="player-screen">
   <!-- Character Management Bar -->
   <div id="char-bar">
     <label>Character:</label>
@@ -423,6 +651,7 @@
       <button class="tab" onclick="switchTab('spells',this)">Spells</button>
       <button class="tab" onclick="switchTab('bio',this)">Biography</button>
       <button class="tab" onclick="switchTab('notes',this)">Notes</button>
+      <button class="tab" onclick="switchTab('dice',this)">🎲 Dice</button>
     </div>
 
     <!-- TAB: STATS -->
@@ -464,10 +693,23 @@
           </div>
           <div class="section">
             <div class="section-title">Inspiration</div>
-            <div class="section-body">
+            <div class="section-body" style="display:flex;flex-direction:column;gap:10px">
               <div class="inspiration-box" id="inspirationBox" onclick="toggleInspiration()">
-                <div class="star">★</div>
-                <label>Inspiration</label>
+                <div class="star" id="inspirationDieLabel">★ d6</div>
+                <label>Click to toggle</label>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap">
+                <span style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--faded)">Die:</span>
+                <select id="inspirationDie" onchange="updateInspirationLabel();autosave()"
+                  style="font-family:'Cinzel',serif;font-size:0.85rem;font-weight:600;
+                         background:var(--parchment-mid);border:1px solid var(--border-light);
+                         border-radius:3px;padding:4px 8px;color:var(--ink);outline:none;cursor:pointer">
+                  <option value="d4">d4</option>
+                  <option value="d6" selected>d6</option>
+                  <option value="d8">d8</option>
+                  <option value="d10">d10</option>
+                  <option value="d12">d12</option>
+                </select>
               </div>
             </div>
           </div>
@@ -677,6 +919,70 @@
       </div>
     </div>
 
+    <!-- TAB: DICE -->
+    <div id="tab-dice" class="tab-pane">
+      <div class="dice-tab">
+        <!-- Controls -->
+        <div style="margin-bottom:20px">
+          <div class="section">
+            <div class="section-title">Roll Modifier</div>
+            <div class="section-body">
+              <div class="modifier-row">
+                <label>Flat Modifier</label>
+                <input type="number" id="diceModifier" value="0" placeholder="0">
+                <span style="font-family:'Cinzel',serif;font-size:0.75rem;color:var(--faded)">(added to every roll)</span>
+              </div>
+            </div>
+          </div>
+          <div id="luckySection" style="display:none"></div>
+        </div>
+
+        <!-- Dice buttons -->
+        <div class="section" style="margin-bottom:20px">
+          <div class="section-title">Choose a Die</div>
+          <div class="section-body">
+            <div class="dice-grid" id="diceGrid">
+              <button class="die-btn" data-sides="4" onclick="rollDie(4)"><span class="die-icon">◆</span>d4</button>
+              <button class="die-btn" data-sides="6" onclick="rollDie(6)"><span class="die-icon">⬡</span>d6</button>
+              <button class="die-btn" data-sides="8" onclick="rollDie(8)"><span class="die-icon">◈</span>d8</button>
+              <button class="die-btn" data-sides="10" onclick="rollDie(10)"><span class="die-icon">◉</span>d10</button>
+              <button class="die-btn" data-sides="12" onclick="rollDie(12)"><span class="die-icon">✦</span>d12</button>
+              <button class="die-btn" data-sides="20" onclick="rollDie(20)"><span class="die-icon">⬟</span>d20</button>
+              <button class="die-btn" data-sides="100" onclick="rollDie(100)"><span class="die-icon">⊕</span>d100</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Result -->
+        <div class="grid-2" style="gap:16px">
+          <div>
+            <div class="section">
+              <div class="section-title">Result</div>
+              <div class="section-body">
+                <div class="roll-result">
+                  <div class="roll-number" id="rollDisplay">—</div>
+                  <div class="roll-label" id="rollLabel">Roll a die to begin</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="section">
+              <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;padding-right:10px">
+                <span>History</span>
+                <button onclick="clearHistory()" style="font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;background:transparent;border:1px solid rgba(245,230,200,0.3);color:rgba(245,230,200,0.6);padding:2px 8px;border-radius:2px;cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='var(--parchment)';this.style.borderColor='var(--parchment)'" onmouseout="this.style.color='rgba(245,230,200,0.6)';this.style.borderColor='rgba(245,230,200,0.3)'">Clear</button>
+              </div>
+              <div class="section-body">
+                <div class="roll-history" id="rollHistory">
+                  <div style="text-align:center;color:var(--faded);font-style:italic;font-size:0.9rem;padding:16px">No rolls yet</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- TAB: NOTES -->
     <div id="tab-notes" class="tab-pane sheet-body">
       <div class="grid-2">
@@ -711,6 +1017,11 @@
       </div>
     </div>
   </div>
+  </div><!-- /player-screen -->
+
+  <!-- DM SCREEN -->
+  <div id="dm-screen"></div>
+
 </div>
 
 <div id="save-status">✓ Saved</div>
@@ -719,19 +1030,22 @@
 // ─── State ───────────────────────────────────────────────────────────────────
 const ABILITY_SCORES = ['Strength','Dexterity','Constitution','Intelligence','Wisdom','Charisma'];
 const ABILITY_ABBR = ['STR','DEX','CON','INT','WIS','CHA'];
-const SKILLS_LIST = [
+let SKILLS_LIST = [
   {name:'Acrobatics', attr:'DEX'},{name:'Animal Handling', attr:'WIS'},
   {name:'Arcana', attr:'INT'},{name:'Athletics', attr:'STR'},
   {name:'Deception', attr:'CHA'},{name:'History', attr:'INT'},
-  {name:'Insight', attr:'WIS'},{name:'Intimidation', attr:'CHA'},
+  {name:'Insight', attr:'WIS'},{name:'Intimidation', attr:'CHA', toggleable:true},
   {name:'Investigation', attr:'INT'},{name:'Medicine', attr:'WIS'},
   {name:'Nature', attr:'INT'},{name:'Perception', attr:'WIS'},
   {name:'Performance', attr:'CHA'},{name:'Persuasion', attr:'CHA'},
   {name:'Religion', attr:'INT'},{name:'Sleight of Hand', attr:'DEX'},
   {name:'Stealth', attr:'DEX'},{name:'Survival', attr:'WIS'}
 ];
+// Track Intimidation attr: 'CHA' or 'STR'
+let intimidationAttr = 'CHA';
 const SPELL_LEVELS = ['Cantrips','1st','2nd','3rd','4th','5th','6th','7th','8th','9th'];
-const MAX_SLOTS = [0,4,3,3,3,3,2,2,1,1];
+// Default max slots per level (index 0 = cantrips, no slots)
+let MAX_SLOTS = [0,4,3,3,3,3,2,2,1,1];
 
 let currentId = null;
 let saveTimer = null;
@@ -752,18 +1066,17 @@ document.addEventListener('DOMContentLoaded', () => {
 // ─── Build UI Components ─────────────────────────────────────────────────────
 function buildAbilityScores() {
   const grid = document.getElementById('stats-grid');
-  grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px';
-  ABILITY_SCORES.forEach((name, i) => {
+  grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%';
+  grid.innerHTML = ABILITY_SCORES.map((name, i) => {
     const abbr = ABILITY_ABBR[i];
-    grid.innerHTML += `
-      <div class="stat-box">
+    return `<div class="stat-box">
         <label>${name}</label>
         <input class="score-input" type="number" id="score_${abbr}" value="10" min="1" max="30"
           oninput="updateAll();autosave()" placeholder="10">
         <div class="modifier" id="mod_${abbr}">+0</div>
         <div class="stat-label-tag">${abbr}</div>
       </div>`;
-  });
+  }).join('');
 }
 
 function buildSavingThrows() {
@@ -780,13 +1093,27 @@ function buildSavingThrows() {
 
 function buildSkills() {
   const list = document.getElementById('skills-list');
-  list.innerHTML = SKILLS_LIST.map((s, i) => `
-    <div class="skill-row">
+  list.innerHTML = SKILLS_LIST.map((s, i) => {
+    const attrDisplay = s.toggleable
+      ? `<span class="skill-attr-toggle" id="intim_toggle" onclick="toggleIntimidation()" title="Click to switch between CHA and STR">${s.attr} ⇄</span>`
+      : `<span class="skill-attr">${s.attr}</span>`;
+    return `<div class="skill-row">
       <div class="skill-check prof-toggle" id="skill_prof_${i}" onclick="toggleSkillProf(${i})"></div>
       <span class="skill-bonus" id="skill_bonus_${i}">+0</span>
       <span class="skill-name">${s.name}</span>
-      <span class="skill-attr">${s.attr}</span>
-    </div>`).join('');
+      ${attrDisplay}
+    </div>`;
+  }).join('');
+}
+
+function toggleIntimidation() {
+  const intimidIdx = SKILLS_LIST.findIndex(s => s.toggleable);
+  intimidationAttr = intimidationAttr === 'CHA' ? 'STR' : 'CHA';
+  SKILLS_LIST[intimidIdx].attr = intimidationAttr;
+  const toggle = document.getElementById('intim_toggle');
+  if(toggle) toggle.textContent = intimidationAttr + ' ⇄';
+  updateAll();
+  autosave();
 }
 
 function buildDeathSaves() {
@@ -821,10 +1148,18 @@ function buildSpellLevels() {
   container.innerHTML = '';
   SPELL_LEVELS.forEach((level, idx) => {
     const slotCount = MAX_SLOTS[idx];
-    const slots = idx === 0 ? '' : `
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
-        <span style="font-family:'Cinzel',serif;font-size:0.65rem;color:var(--faded);text-transform:uppercase;letter-spacing:0.08em">Slots:</span>
-        ${Array.from({length:slotCount},(_,j)=>`<div class="slot-pip" id="slot_${idx}_${j}" onclick="toggleSlot(${idx},${j})"></div>`).join('')}
+    const slotsEditor = idx === 0 ? '' : `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+        <span style="font-family:'Cinzel',serif;font-size:0.65rem;color:var(--faded);text-transform:uppercase;letter-spacing:0.08em;flex-shrink:0">Max Slots:</span>
+        <input type="number" id="maxslot_${idx}" value="${slotCount}" min="0" max="9"
+          style="font-family:'Cinzel',serif;font-size:0.9rem;font-weight:700;width:50px;text-align:center;
+                 background:var(--parchment-mid);border:1px solid var(--border-light);border-radius:3px;
+                 padding:3px 4px;outline:none;color:var(--ink)"
+          oninput="updateSlotPips(${idx}); autosave()">
+        <span style="font-family:'Cinzel',serif;font-size:0.65rem;color:var(--faded);text-transform:uppercase;letter-spacing:0.08em;flex-shrink:0">Used:</span>
+        <div id="slot_pips_${idx}" style="display:flex;gap:6px;flex-wrap:wrap">
+          ${Array.from({length:slotCount},(_,j)=>`<div class="slot-pip" id="slot_${idx}_${j}" onclick="toggleSlot(${idx},${j})"></div>`).join('')}
+        </div>
       </div>`;
     container.innerHTML += `
       <div class="section" style="margin-bottom:14px">
@@ -833,11 +1168,23 @@ function buildSpellLevels() {
           ${level} Level Spells
         </div>
         <div class="section-body">
-          ${slots}
+          ${slotsEditor}
           <textarea id="spells_${idx}" rows="${idx===0?4:5}" placeholder="${idx===0?'Cantrips (at-will)...':'Level '+idx+' spells...'}" oninput="autosave()"></textarea>
         </div>
       </div>`;
   });
+}
+
+function updateSlotPips(lvl) {
+  const input = document.getElementById('maxslot_'+lvl);
+  const newCount = Math.max(0, Math.min(9, parseInt(input.value)||0));
+  input.value = newCount;
+  MAX_SLOTS[lvl] = newCount;
+  // Remember which slots were used before rebuild
+  const prevUsed = Array.from({length:9},(_,j) => document.getElementById('slot_'+lvl+'_'+j)?.classList.contains('used'));
+  const container = document.getElementById('slot_pips_'+lvl);
+  container.innerHTML = Array.from({length:newCount},(_,j)=>`
+    <div class="slot-pip${prevUsed[j]?' used':''}" id="slot_${lvl}_${j}" onclick="toggleSlot(${lvl},${j})"></div>`).join('');
 }
 
 // ─── Calculations ─────────────────────────────────────────────────────────────
@@ -897,6 +1244,11 @@ function toggleInspiration() {
   document.getElementById('inspirationBox')?.classList.toggle('active', inspiration);
   autosave();
 }
+function updateInspirationLabel() {
+  const die = document.getElementById('inspirationDie')?.value || 'd6';
+  const label = document.getElementById('inspirationDieLabel');
+  if(label) label.textContent = '★ ' + die;
+}
 function toggleDeath(type, idx) {
   const id = type==='success' ? 'ds_' : 'df_';
   const cls = type==='success' ? 'success-filled' : 'failure-filled';
@@ -937,7 +1289,7 @@ function getCharacterData() {
    'age','height','weight','eyes','skin','hair',
    'allies','backstory','sessionNotes','treasure',
    'additionalFeatures','npcNotes',
-   'cp','sp','ep','gp','pp'
+   'cp','sp','ep','gp','pp','inspirationDie'
   ].forEach(id => {
     const el = document.getElementById(id);
     if(el) data[id] = el.value;
@@ -968,10 +1320,13 @@ function getCharacterData() {
   data.deathSuccess = [0,1,2].map(i => document.getElementById('ds_'+i)?.classList.contains('success-filled'));
   data.deathFail = [0,1,2].map(i => document.getElementById('df_'+i)?.classList.contains('failure-filled'));
 
+  data.intimidationAttr = intimidationAttr;
   // Spell slots
   data.spellSlots = {};
+  data.maxSlots = {};
   SPELL_LEVELS.forEach((_,lvl) => {
     if(lvl===0) return;
+    data.maxSlots[lvl] = MAX_SLOTS[lvl];
     data.spellSlots[lvl] = Array.from({length:MAX_SLOTS[lvl]},(_,j) => document.getElementById('slot_'+lvl+'_'+j)?.classList.contains('used'));
   });
 
@@ -1031,12 +1386,28 @@ function applyCharacterData(data) {
   // Inspiration
   inspiration = !!data.inspiration;
   document.getElementById('inspirationBox')?.classList.toggle('active', inspiration);
+  updateInspirationLabel();
 
   // Death saves
   (data.deathSuccess||[]).forEach((v,i) => document.getElementById('ds_'+i)?.classList.toggle('success-filled',!!v));
   (data.deathFail||[]).forEach((v,i) => document.getElementById('df_'+i)?.classList.toggle('failure-filled',!!v));
 
-  // Spell slots
+  // Restore intimidation attr
+  if(data.intimidationAttr) {
+    intimidationAttr = data.intimidationAttr;
+    const intimidIdx = SKILLS_LIST.findIndex(s => s.toggleable);
+    if(intimidIdx !== -1) SKILLS_LIST[intimidIdx].attr = intimidationAttr;
+    const toggle = document.getElementById('intim_toggle');
+    if(toggle) toggle.textContent = intimidationAttr + ' ⇄';
+  }
+  // Spell slots — restore max counts first, then used state
+  if(data.maxSlots) {
+    Object.entries(data.maxSlots).forEach(([lvl, count]) => {
+      MAX_SLOTS[parseInt(lvl)] = count;
+      const input = document.getElementById('maxslot_'+lvl);
+      if(input) { input.value = count; updateSlotPips(parseInt(lvl)); }
+    });
+  }
   if(data.spellSlots) {
     Object.entries(data.spellSlots).forEach(([lvl, slots]) => {
       (slots||[]).forEach((used, j) => document.getElementById('slot_'+lvl+'_'+j)?.classList.toggle('used',!!used));
@@ -1131,14 +1502,25 @@ function resetSheet() {
   ABILITY_ABBR.forEach(a => document.getElementById('save_prof_'+a)?.classList.remove('proficient'));
   inspiration = false;
   document.getElementById('inspirationBox')?.classList.remove('active');
+  const dieEl = document.getElementById('inspirationDie'); if(dieEl) dieEl.value='d6';
+  updateInspirationLabel();
   [0,1,2].forEach(i => {
     document.getElementById('ds_'+i)?.classList.remove('success-filled');
     document.getElementById('df_'+i)?.classList.remove('failure-filled');
   });
+  intimidationAttr = 'CHA';
+  const intimidIdx2 = SKILLS_LIST.findIndex(s => s.toggleable);
+  if(intimidIdx2 !== -1) SKILLS_LIST[intimidIdx2].attr = 'CHA';
+  const it = document.getElementById('intim_toggle'); if(it) it.textContent = 'CHA ⇄';
+  // Reset spell slots
+  MAX_SLOTS = [0,4,3,3,3,2,2,1,1,1];
   SPELL_LEVELS.forEach((_,lvl) => {
     const e = document.getElementById('spells_'+lvl);
     if(e) e.value = '';
-    if(lvl>0) Array.from({length:MAX_SLOTS[lvl]},(_,j) => document.getElementById('slot_'+lvl+'_'+j)?.classList.remove('used'));
+    if(lvl>0) {
+      const input = document.getElementById('maxslot_'+lvl);
+      if(input) { input.value = MAX_SLOTS[lvl]; updateSlotPips(lvl); }
+    }
   });
   const list = document.getElementById('attacks-list');
   list.innerHTML = '';
@@ -1201,13 +1583,557 @@ function showSaved() {
   setTimeout(() => el.classList.remove('show'), 1800);
 }
 
-// ─── Tab switching ────────────────────────────────────────────────────────────
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-'+name)?.classList.add('active');
-  btn.classList.add('active');
+// ─── Dice Roller ─────────────────────────────────────────────────────────────
+let luckyMode = false;
+let rollHistoryArr = [];
+
+function rollDie(sides) {
+  const modifier = parseInt(document.getElementById('diceModifier')?.value) || 0;
+  let raw;
+  if(luckyMode) {
+    // Top 25% of range: ceil(0.75 * sides) up to sides
+    const minVal = Math.max(1, Math.ceil(0.75 * sides));
+    raw = minVal + Math.floor(Math.random() * (sides - minVal + 1));
+  } else {
+    raw = 1 + Math.floor(Math.random() * sides);
+  }
+  const total = raw + modifier;
+
+  const display = document.getElementById('rollDisplay');
+  const label = document.getElementById('rollLabel');
+  if(display) {
+    display.textContent = total;
+    display.className = 'roll-number';
+    if(raw === sides && sides > 1) display.classList.add('crit');
+    else if(raw === 1) display.classList.add('fumble');
+    display.classList.remove('roll-pop');
+    void display.offsetWidth;
+    display.classList.add('roll-pop');
+  }
+  let desc = 'd' + sides;
+  if(raw === sides && sides > 1) desc += ' — CRIT! ✦';
+  else if(raw === 1) desc += ' — Fumble ✗';
+  if(modifier !== 0) desc += ' (' + raw + ' ' + (modifier >= 0 ? '+' : '') + modifier + ')';
+  if(label) label.textContent = desc;
+
+  rollHistoryArr.unshift({sides, raw, total, modifier});
+  if(rollHistoryArr.length > 30) rollHistoryArr.pop();
+  renderHistory();
 }
-</script>
-</body>
-</html>
+
+function clearHistory() {
+  rollHistoryArr = [];
+  renderHistory();
+}
+
+function renderHistory() {
+  const el = document.getElementById('rollHistory');
+  if(!el) return;
+  if(!rollHistoryArr.length) { el.innerHTML = '<div style="text-align:center;color:var(--faded);font-style:italic;font-size:0.9rem;padding:16px">No rolls yet</div>'; return; }
+  el.innerHTML = rollHistoryArr.map(r =>
+    '<div class="roll-history-item">' +
+    '<span class="rh-die">d' + r.sides + '</span>' +
+    '<span class="rh-val">' + r.total + (r.modifier!==0?' ('+r.raw+(r.modifier>=0?'+':'')+r.modifier+')':'') + '</span>' +
+    '</div>').join('');
+}
+
+// ── Lucky Mode ───────────────────────────────────────────────────────────────
+// ON:  click d4 → d6 → d8 in sequence within 1.5s
+// OFF: click d8 → d6 → d4 in sequence within 1.5s
+let _lseq = []; // {sides, time}
+const _ON  = [10, 20, 100];
+const _OFF = [100, 20, 10];
+function _ltrack(sides) {
+  const now = Date.now();
+  _lseq.push({sides, now});
+  _lseq = _lseq.filter(e => now - e.now < 1500);
+  if(_lseq.length > 3) _lseq = _lseq.slice(-3);
+  const seq = _lseq.map(e => e.sides);
+  if(seq.length === 3) {
+    if(!luckyMode && seq[0]===10 && seq[1]===20 && seq[2]===100) {
+      _lseq = []; enableLucky();
+    } else if(luckyMode && seq[0]===100 && seq[1]===20 && seq[2]===10) {
+      _lseq = []; disableLucky();
+    }
+  }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.die-btn').forEach(b => {
+    const sides = parseInt(b.getAttribute('data-sides'));
+    if(sides) b.addEventListener('click', () => _ltrack(sides));
+  });
+});
+
+function enableLucky() {
+  luckyMode = true;
+  document.querySelectorAll('.die-btn').forEach(b => {
+    b.classList.add('lucky-active');
+    b.style.boxShadow = 'inset 0 0 8px rgba(184,134,11,0.18)';
+  });
+}
+function disableLucky() {
+  luckyMode = false;
+  document.querySelectorAll('.die-btn').forEach(b => {
+    b.classList.remove('lucky-active');
+    b.style.boxShadow = '';
+  });
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DM SCREEN
+// ═══════════════════════════════════════════════════════════════════════════
+let dmMode = false;
+let currentCampaignId = null;
+let dmSaveTimer = null;
+
+function setMode(mode) {
+  dmMode = (mode === 'dm');
+  document.getElementById('player-screen').classList.toggle('hidden', dmMode);
+  document.getElementById('dm-screen').classList.toggle('active', dmMode);
+  document.getElementById('modePlayer').classList.toggle('active', !dmMode);
+  document.getElementById('modeDM').classList.toggle('active', dmMode);
+  if(dmMode) {
+    if(!document.getElementById('dm-screen').innerHTML.trim()) buildDMScreen();
+    loadCampaignList();
+  }
+}
+
+function buildDMScreen() {
+  document.getElementById('dm-screen').innerHTML = `
+    <div class="dm-bar">
+      <label>Campaign:</label>
+      <select id="campaign-select" onchange="loadCampaign()"><option value="">— New Campaign —</option></select>
+      <button class="btn btn-gold" onclick="newCampaign()">New</button>
+      <button class="btn btn-dark" onclick="saveCampaign()">Save</button>
+      <button class="btn btn-dark" onclick="exportCampaign()">Export</button>
+      <button class="btn btn-dark" onclick="importCampaign()">Import</button>
+      <button class="btn btn-red" onclick="deleteCampaign()">Delete</button>
+    </div>
+    <div class="dm-sheet">
+      <div class="dm-sheet-header">
+        <h2 id="dm-campaign-title">New Campaign</h2>
+        <p>Dungeon Master Screen</p>
+      </div>
+      <div class="dm-tabs" id="dm-tabs">
+        <button class="dm-tab active" onclick="switchDMTab('overview',this)">📜 Overview</button>
+        <button class="dm-tab" onclick="switchDMTab('initiative',this)">⚔ Initiative</button>
+        <button class="dm-tab" onclick="switchDMTab('monsters',this)">🐉 Monsters</button>
+        <button class="dm-tab" onclick="switchDMTab('monsterdice',this)">🎲 Monster Dice</button>
+        <button class="dm-tab" onclick="switchDMTab('npcs',this)">🧙 NPCs</button>
+        <button class="dm-tab" onclick="switchDMTab('locations',this)">🗺 Locations</button>
+        <button class="dm-tab" onclick="switchDMTab('loot',this)">💰 Loot</button>
+        <button class="dm-tab" onclick="switchDMTab('session',this)">📓 Session Notes</button>
+      </div>
+
+      <!-- OVERVIEW -->
+      <div id="dmtab-overview" class="dm-body tab-pane active">
+        <div class="grid-2" style="margin-bottom:20px">
+          <div>
+            <label class="dm-label">Campaign Name</label>
+            <input class="dm-input" id="dm-campaign-name" placeholder="The Lost Mines of..." oninput="document.getElementById('dm-campaign-title').textContent=this.value||'New Campaign'; dmAutosave()">
+          </div>
+          <div>
+            <label class="dm-label">Setting / World</label>
+            <input class="dm-input" id="dm-setting" placeholder="Forgotten Realms, Homebrew..." oninput="dmAutosave()">
+          </div>
+        </div>
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="section">
+            <div class="section-title">Campaign Summary</div>
+            <div class="section-body">
+              <textarea class="dm-textarea" id="dm-summary" rows="6" placeholder="The main arc, central conflict, themes..." oninput="dmAutosave()"></textarea>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-title">Current Arc / Quest</div>
+            <div class="section-body">
+              <textarea class="dm-textarea" id="dm-current-arc" rows="6" placeholder="What the party is currently doing..." oninput="dmAutosave()"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="section">
+            <div class="section-title">Party Members</div>
+            <div class="section-body">
+              <textarea class="dm-textarea" id="dm-party" rows="6" placeholder="Player 1 — Aragorn (Human Fighter 5)&#10;Player 2 — Gandalf (Wizard 10)..." oninput="dmAutosave()"></textarea>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-title">Factions & Politics</div>
+            <div class="section-body">
+              <textarea class="dm-textarea" id="dm-factions" rows="6" placeholder="The Harpers: friendly&#10;The Zhentarim: hostile..." oninput="dmAutosave()"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-title">DM Private Notes</div>
+          <div class="section-body">
+            <textarea class="dm-textarea" id="dm-private-notes" rows="8" placeholder="Upcoming plot twists, secrets the players don't know, reminders..." oninput="dmAutosave()"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- INITIATIVE -->
+      <div id="dmtab-initiative" class="dm-body tab-pane" style="display:none">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:flex-end">
+          <div>
+            <label class="dm-label">Name</label>
+            <input class="dm-input" id="init-name-in" placeholder="Goblin #1" style="width:160px">
+          </div>
+          <div>
+            <label class="dm-label">Initiative</label>
+            <input class="dm-input" id="init-val-in" type="number" placeholder="12" style="width:70px">
+          </div>
+          <div>
+            <label class="dm-label">Max HP</label>
+            <input class="dm-input" id="init-hp-in" type="number" placeholder="20" style="width:70px">
+          </div>
+          <div style="display:flex;gap:6px;margin-top:auto">
+            <button class="btn btn-gold" onclick="addInitEntry()">Add</button>
+            <button class="btn btn-dark" onclick="sortInitiative()">Sort ↓</button>
+            <button class="btn btn-dark" onclick="nextTurn()">Next Turn ▶</button>
+            <button class="btn btn-red" onclick="clearInitiative()">Clear</button>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-title">Turn Order</div>
+          <div class="section-body" style="padding:8px 12px">
+            <div style="display:grid;grid-template-columns:48px 1fr 60px 60px 48px;gap:8px;margin-bottom:6px">
+              <span style="font-family:'Cinzel',serif;font-size:0.6rem;color:var(--faded);text-transform:uppercase;letter-spacing:0.08em">Init</span>
+              <span style="font-family:'Cinzel',serif;font-size:0.6rem;color:var(--faded);text-transform:uppercase;letter-spacing:0.08em">Name</span>
+              <span style="font-family:'Cinzel',serif;font-size:0.6rem;color:var(--faded);text-transform:uppercase;letter-spacing:0.08em;text-align:center">HP</span>
+              <span style="font-family:'Cinzel',serif;font-size:0.6rem;color:var(--faded);text-transform:uppercase;letter-spacing:0.08em;text-align:center">Max</span>
+              <span></span>
+            </div>
+            <div id="init-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MONSTERS -->
+      <div id="dmtab-monsters" class="dm-body tab-pane" style="display:none">
+        <button class="btn btn-gold" style="margin-bottom:16px;width:100%" onclick="addMonster()">+ Add Monster / Stat Block</button>
+        <div id="monsters-list"></div>
+      </div>
+
+      <!-- MONSTER DICE -->
+      <div id="dmtab-monsterdice" class="dm-body tab-pane" style="display:none">
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
+          <!-- Left: dice buttons + controls -->
+          <div style="flex:1;min-width:260px">
+            <div class="section" style="margin-bottom:16px">
+              <div class="section-title">Roll a Die</div>
+              <div class="section-body">
+                <div class="dice-grid" id="dmDiceGrid">
+                  <button class="die-btn" data-sides="4" onclick="dmRollDie(4)"><span class="die-icon">◆</span>d4</button>
+                  <button class="die-btn" data-sides="6" onclick="dmRollDie(6)"><span class="die-icon">⬡</span>d6</button>
+                  <button class="die-btn" data-sides="8" onclick="dmRollDie(8)"><span class="die-icon">◈</span>d8</button>
+                  <button class="die-btn" data-sides="10" onclick="dmRollDie(10)"><span class="die-icon">◉</span>d10</button>
+                  <button class="die-btn" data-sides="12" onclick="dmRollDie(12)"><span class="die-icon">✦</span>d12</button>
+                  <button class="die-btn" data-sides="20" onclick="dmRollDie(20)"><span class="die-icon">⬟</span>d20</button>
+                  <button class="die-btn" data-sides="100" onclick="dmRollDie(100)"><span class="die-icon">⊕</span>d100</button>
+                </div>
+              </div>
+            </div>
+            <div class="section" style="margin-bottom:16px">
+              <div class="section-title">Modifier</div>
+              <div class="section-body">
+                <div class="modifier-row">
+                  <label>Flat Modifier</label>
+                  <input type="number" id="dmDiceModifier" value="0" placeholder="0"
+                    style="width:70px;font-family:'Cinzel',serif;font-size:0.95rem;font-weight:700;text-align:center;background:var(--parchment-mid);border:1px solid var(--border-light);border-radius:3px;padding:4px 6px;outline:none;color:var(--ink)">
+                </div>
+              </div>
+            </div>
+            <div class="section">
+              <div class="section-title">Quick Roll — Ability Check</div>
+              <div class="section-body" style="display:flex;flex-direction:column;gap:8px">
+                <div style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--faded);margin-bottom:4px">Roll d20 + modifier for a monster stat</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  ${['STR','DEX','CON','INT','WIS','CHA'].map(a =>
+                    `<button class="btn btn-dark" style="font-size:0.65rem;padding:6px 10px" onclick="dmRollAbility('${a}')">${a}</button>`
+                  ).join('')}
+                </div>
+                <div style="margin-top:6px">
+                  <label style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--faded);display:block;margin-bottom:4px">Monster (for stat lookup)</label>
+                  <select id="dmAbilityMonsterSelect" class="dm-input" style="font-family:'Crimson Text',serif" onchange="">
+                    <option value="">— No monster selected —</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Right: result + history -->
+          <div style="flex:1;min-width:220px">
+            <div class="section" style="margin-bottom:16px">
+              <div class="section-title">Result</div>
+              <div class="section-body">
+                <div class="roll-result">
+                  <div class="roll-number" id="dmRollDisplay">—</div>
+                  <div class="roll-label" id="dmRollLabel">Roll a die to begin</div>
+                </div>
+              </div>
+            </div>
+            <div class="section">
+              <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;padding-right:10px">
+                <span>History</span>
+                <button onclick="clearDMHistory()" style="font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;background:transparent;border:1px solid rgba(245,230,200,0.3);color:rgba(245,230,200,0.6);padding:2px 8px;border-radius:2px;cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='var(--parchment)';this.style.borderColor='var(--parchment)'" onmouseout="this.style.color='rgba(245,230,200,0.6)';this.style.borderColor='rgba(245,230,200,0.3)'">Clear</button>
+              </div>
+              <div class="section-body">
+                <div class="roll-history" id="dmRollHistory">
+                  <div style="text-align:center;color:var(--faded);font-style:italic;font-size:0.9rem;padding:16px">No rolls yet</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NPCS -->
+      <div id="dmtab-npcs" class="dm-body tab-pane" style="display:none">
+        <button class="btn btn-gold" style="margin-bottom:16px;width:100%" onclick="addNPC()">+ Add NPC</button>
+        <div id="npcs-list"></div>
+      </div>
+
+      <!-- LOCATIONS -->
+      <div id="dmtab-locations" class="dm-body tab-pane" style="display:none">
+        <button class="btn btn-gold" style="margin-bottom:16px;width:100%" onclick="addLocation()">+ Add Location</button>
+        <div id="locations-list"></div>
+      </div>
+
+      <!-- LOOT -->
+      <div id="dmtab-loot" class="dm-body tab-pane" style="display:none">
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="section">
+            <div class="section-title">Party Loot Pool</div>
+            <div class="section-body">
+              <div class="currency-row" style="margin-bottom:14px">
+                <div class="coin"><label>CP</label><input type="number" id="loot-cp" value="0" class="dm-input" style="padding:4px 2px;text-align:center;font-family:'Cinzel',serif;font-size:1.1rem" oninput="dmAutosave()"></div>
+                <div class="coin"><label>SP</label><input type="number" id="loot-sp" value="0" class="dm-input" style="padding:4px 2px;text-align:center;font-family:'Cinzel',serif;font-size:1.1rem" oninput="dmAutosave()"></div>
+                <div class="coin"><label>EP</label><input type="number" id="loot-ep" value="0" class="dm-input" style="padding:4px 2px;text-align:center;font-family:'Cinzel',serif;font-size:1.1rem" oninput="dmAutosave()"></div>
+                <div class="coin"><label>GP</label><input type="number" id="loot-gp" value="0" class="dm-input" style="padding:4px 2px;text-align:center;font-family:'Cinzel',serif;font-size:1.1rem" oninput="dmAutosave()"></div>
+                <div class="coin"><label>PP</label><input type="number" id="loot-pp" value="0" class="dm-input" style="padding:4px 2px;text-align:center;font-family:'Cinzel',serif;font-size:1.1rem" oninput="dmAutosave()"></div>
+              </div>
+              <label class="dm-label">Magic Items & Valuables</label>
+              <textarea class="dm-textarea" id="loot-items" rows="8" placeholder="+1 Longsword&#10;Potion of Healing x3&#10;Ancient map fragment..." oninput="dmAutosave()"></textarea>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-title">Random Loot Generator</div>
+            <div class="section-body">
+              <div style="margin-bottom:12px">
+                <label class="dm-label">CR / Difficulty</label>
+                <select class="dm-input" id="loot-cr" style="font-family:'Crimson Text',serif">
+                  <option value="low">Low (CR 1-4)</option>
+                  <option value="mid" selected>Medium (CR 5-10)</option>
+                  <option value="high">High (CR 11-16)</option>
+                  <option value="epic">Epic (CR 17+)</option>
+                </select>
+              </div>
+              <button class="btn btn-gold" style="width:100%;margin-bottom:10px" onclick="generateLoot()">🎲 Generate Loot</button>
+              <div id="loot-result" style="font-family:'Crimson Text',serif;font-size:0.95rem;color:var(--ink);min-height:60px;padding:8px;border:1px solid var(--border-light);border-radius:3px;background:var(--parchment-mid)">
+                Click Generate to roll random loot...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SESSION NOTES -->
+      <div id="dmtab-session" class="dm-body tab-pane" style="display:none">
+        <div class="grid-2" style="margin-bottom:20px">
+          <div>
+            <label class="dm-label">Session Number</label>
+            <input class="dm-input" id="dm-session-num" placeholder="Session 12" oninput="dmAutosave()">
+          </div>
+          <div>
+            <label class="dm-label">Date</label>
+            <input class="dm-input" id="dm-session-date" type="date" oninput="dmAutosave()">
+          </div>
+        </div>
+        <div class="section" style="margin-bottom:16px">
+          <div class="section-title">Session Prep / Plan</div>
+          <div class="section-body">
+            <textarea class="dm-textarea" id="dm-session-prep" rows="8" placeholder="Planned encounters, story beats, key moments..." oninput="dmAutosave()"></textarea>
+          </div>
+        </div>
+        <div class="section" style="margin-bottom:16px">
+          <div class="section-title">What Actually Happened</div>
+          <div class="section-body">
+            <textarea class="dm-textarea" id="dm-session-actual" rows="8" placeholder="What the party did, surprises, memorable moments..." oninput="dmAutosave()"></textarea>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-title">Cliffhanger / Next Session Hook</div>
+          <div class="section-body">
+            <textarea class="dm-textarea" id="dm-session-hook" rows="5" placeholder="Where did we leave off? What's next?" oninput="dmAutosave()"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  renderInitList();
+  renderMonsterList();
+  renderNPCList();
+  renderLocationList();
+}
+
+function switchDMTab(name, btn) {
+  document.querySelectorAll('.dm-body.tab-pane').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.dm-tab').forEach(t => t.classList.remove('active'));
+  const pane = document.getElementById('dmtab-' + name);
+  if(pane) pane.style.display = 'block';
+  btn.classList.add('active');
+  if(name === 'monsterdice') refreshMonsterSelect();
+}
+
+// ── Campaign save/load ───────────────────────────────────────────────────────
+function getCampaignData() {
+  const g = id => document.getElementById(id)?.value || '';
+  return {
+    name: g('dm-campaign-name'), setting: g('dm-setting'),
+    summary: g('dm-summary'), currentArc: g('dm-current-arc'),
+    party: g('dm-party'), factions: g('dm-factions'),
+    privateNotes: g('dm-private-notes'),
+    sessionNum: g('dm-session-num'), sessionDate: g('dm-session-date'),
+    sessionPrep: g('dm-session-prep'), sessionActual: g('dm-session-actual'),
+    sessionHook: g('dm-session-hook'),
+    lootCp: g('loot-cp'), lootSp: g('loot-sp'), lootEp: g('loot-ep'),
+    lootGp: g('loot-gp'), lootPp: g('loot-pp'), lootItems: g('loot-items'),
+    monsters: getMonsterData(),
+    npcs: getNPCData(),
+    locations: getLocationData(),
+    initiative: getInitData(),
+  };
+}
+
+function applyCampaignData(d) {
+  if(!d) return;
+  const s = (id, val) => { const el=document.getElementById(id); if(el) el.value=val||''; };
+  s('dm-campaign-name', d.name); s('dm-setting', d.setting);
+  s('dm-summary', d.summary); s('dm-current-arc', d.currentArc);
+  s('dm-party', d.party); s('dm-factions', d.factions);
+  s('dm-private-notes', d.privateNotes);
+  s('dm-session-num', d.sessionNum); s('dm-session-date', d.sessionDate);
+  s('dm-session-prep', d.sessionPrep); s('dm-session-actual', d.sessionActual);
+  s('dm-session-hook', d.sessionHook);
+  s('loot-cp', d.lootCp||0); s('loot-sp', d.lootSp||0); s('loot-ep', d.lootEp||0);
+  s('loot-gp', d.lootGp||0); s('loot-pp', d.lootPp||0); s('loot-items', d.lootItems);
+  const title = document.getElementById('dm-campaign-title');
+  if(title) title.textContent = d.name || 'New Campaign';
+  dmMonsters = d.monsters || [];
+  dmNPCs = d.npcs || [];
+  dmLocations = d.locations || [];
+  dmInitiative = d.initiative || [];
+  renderMonsterList(); renderNPCList(); renderLocationList(); renderInitList();
+}
+
+function saveCampaign() {
+  if(!document.getElementById('dm-campaign-name')) return;
+  const data = getCampaignData();
+  const name = data.name || 'Unnamed Campaign';
+  let campaigns = JSON.parse(localStorage.getItem('dnd_campaigns') || '{}');
+  if(!currentCampaignId) currentCampaignId = 'camp_' + Date.now();
+  campaigns[currentCampaignId] = { name, data, updated: new Date().toISOString() };
+  localStorage.setItem('dnd_campaigns', JSON.stringify(campaigns));
+  loadCampaignList();
+  showSaved();
+}
+
+function loadCampaignList() {
+  const sel = document.getElementById('campaign-select');
+  if(!sel) return;
+  const prev = currentCampaignId;
+  sel.innerHTML = '<option value="">— New Campaign —</option>';
+  const campaigns = JSON.parse(localStorage.getItem('dnd_campaigns') || '{}');
+  Object.entries(campaigns).sort((a,b)=>b[1].updated.localeCompare(a[1].updated)).forEach(([id,c])=>{
+    const opt = document.createElement('option');
+    opt.value = id; opt.textContent = c.name + ' · ' + new Date(c.updated).toLocaleDateString();
+    if(id===prev) opt.selected=true;
+    sel.appendChild(opt);
+  });
+}
+
+function loadCampaign() {
+  const sel = document.getElementById('campaign-select');
+  currentCampaignId = sel?.value || null;
+  if(!currentCampaignId) { resetCampaign(); return; }
+  const campaigns = JSON.parse(localStorage.getItem('dnd_campaigns') || '{}');
+  applyCampaignData(campaigns[currentCampaignId]?.data);
+}
+
+function newCampaign() {
+  currentCampaignId = null;
+  const sel = document.getElementById('campaign-select');
+  if(sel) sel.value = '';
+  resetCampaign();
+}
+
+function resetCampaign() {
+  ['dm-campaign-name','dm-setting','dm-summary','dm-current-arc','dm-party','dm-factions',
+   'dm-private-notes','dm-session-num','dm-session-date','dm-session-prep','dm-session-actual',
+   'dm-session-hook','loot-items'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['loot-cp','loot-sp','loot-ep','loot-gp','loot-pp'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=0;});
+  const t=document.getElementById('dm-campaign-title'); if(t) t.textContent='New Campaign';
+  dmMonsters=[]; dmNPCs=[]; dmLocations=[]; dmInitiative=[];
+  renderMonsterList(); renderNPCList(); renderLocationList(); renderInitList();
+}
+
+function deleteCampaign() {
+  if(!currentCampaignId) return;
+  if(!confirm('Delete this campaign? This cannot be undone.')) return;
+  const campaigns = JSON.parse(localStorage.getItem('dnd_campaigns') || '{}');
+  delete campaigns[currentCampaignId];
+  localStorage.setItem('dnd_campaigns', JSON.stringify(campaigns));
+  currentCampaignId = null;
+  loadCampaignList();
+  resetCampaign();
+}
+
+function exportCampaign() {
+  const data = getCampaignData();
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (data.name||'campaign') + '.json';
+  a.click();
+}
+
+function importCampaign() {
+  const input = document.createElement('input');
+  input.type='file'; input.accept='.json';
+  input.onchange = e => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try { currentCampaignId=null; applyCampaignData(JSON.parse(ev.target.result)); saveCampaign(); }
+      catch { alert('Invalid JSON file.'); }
+    };
+    reader.readAsText(e.target.files[0]);
+  };
+  input.click();
+}
+
+function dmAutosave() {
+  clearTimeout(dmSaveTimer);
+  dmSaveTimer = setTimeout(saveCampaign, 1500);
+}
+
+// ── Initiative Tracker ───────────────────────────────────────────────────────
+let dmInitiative = [];
+let currentTurn = 0;
+
+function addInitEntry() {
+  const name = document.getElementById('init-name-in')?.value.trim();
+  const init = parseInt(document.getElementById('init-val-in')?.value) || 0;
+  const hp   = parseInt(document.getElementById('init-hp-in')?.value) || 0;
+  if(!name) return;
+  dmInitiative.push({name, init, hp, maxHp: hp, id: Date.now()});
+  document.getElementById('init-name-in').value='';
+  document.getElementById('init-val-in').value='';
+  document.getElementById('init-hp-in').value='';
+  renderInitList(); dmAutosave();
+}
+
+function sortInitiative() {
+  dmInitiative.so
