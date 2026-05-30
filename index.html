@@ -131,19 +131,12 @@
     display: flex;
     border-bottom: 2px solid var(--border);
     background: var(--parchment-dark);
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
   }
-  .tabs::-webkit-scrollbar { display: none; }
   .tab {
     font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.1em;
     padding: 11px 20px; cursor: pointer; border: none; background: transparent;
     color: var(--faded); text-transform: uppercase; border-right: 1px solid var(--border-light);
     transition: all 0.15s; position: relative;
-    flex-shrink: 0;
-    white-space: nowrap;
   }
   .tab:hover { color: var(--ink); background: var(--parchment-mid); }
   .tab.active { color: var(--red); background: var(--parchment); font-weight: 600; }
@@ -160,7 +153,7 @@
   .sheet-body { padding: 24px; }
   .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .grid-main { display: grid; grid-template-columns: 260px 1fr 220px; gap: 20px; }
+  .grid-main { display: grid; grid-template-columns: 180px 1fr 220px; gap: 20px; }
 
   /* Sections */
   .section {
@@ -361,60 +354,6 @@
   .char-portrait input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
   .portrait-hint { font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; }
 
-  .skill-attr-toggle {
-    color: var(--red); font-size: 0.78rem; font-style: italic;
-    cursor: pointer; user-select: none; border-bottom: 1px dashed var(--red);
-    transition: color 0.15s;
-  }
-  .skill-attr-toggle:hover { color: var(--gold); border-bottom-color: var(--gold); }
-
-  /* Dice roller */
-  :root { --muddy-gold: #8B7322; --muddy-gold-light: #a08828; }
-  .dice-tab { padding: 28px 24px; }
-  .dice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 14px; margin-bottom: 28px; }
-  .die-btn {
-    background: linear-gradient(145deg, #2a1800, #1a0c00);
-    border: 2px solid var(--border); border-radius: 8px;
-    color: var(--muddy-gold); font-family: 'Cinzel', serif;
-    font-size: 1.1rem; font-weight: 700; padding: 18px 8px;
-    cursor: pointer; transition: all 0.2s; text-align: center;
-    position: relative; overflow: hidden;
-  }
-  .die-btn:hover { border-color: var(--muddy-gold-light); color: var(--muddy-gold-light); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.5); }
-  .die-btn:active { transform: translateY(0); }
-  .die-btn .die-icon { font-size: 1.8rem; display: block; margin-bottom: 4px; color: var(--muddy-gold); transition: color 0.2s; }
-  .die-btn:hover .die-icon { color: var(--muddy-gold-light); }
-  /* Lucky active state — barely different, just slightly warmer */
-  .die-btn.lucky-active { color: var(--gold-light); }
-  .die-btn.lucky-active .die-icon { color: var(--gold-light); }
-  .roll-result {
-    text-align: center; padding: 24px;
-    border: 2px solid var(--border); border-radius: 8px;
-    background: var(--parchment-mid); margin-bottom: 20px; min-height: 110px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-  }
-  .roll-number {
-    font-family: 'Cinzel', serif; font-size: 4rem; font-weight: 900;
-    color: var(--red); line-height: 1; transition: all 0.2s;
-  }
-  .roll-number.crit { color: #1a6b1a; }
-  .roll-number.fumble { color: #8b1a1a; }
-  .roll-label { font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--faded); }
-  .roll-history { max-height: 180px; overflow-y: auto; }
-  .roll-history-item { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; border-bottom: 1px solid rgba(107,76,17,0.2); font-size: 0.9rem; }
-  .roll-history-item:last-child { border-bottom: none; }
-  .roll-history-item .rh-die { font-family: 'Cinzel', serif; font-size: 0.78rem; color: var(--faded); }
-  .roll-history-item .rh-val { font-family: 'Cinzel', serif; font-weight: 700; color: var(--red); }
-  .modifier-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .modifier-row label { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faded); white-space: nowrap; }
-  .modifier-row input[type=number] {
-    width: 70px; font-family: 'Cinzel', serif; font-size: 0.95rem; font-weight: 700;
-    text-align: center; background: var(--parchment-mid); border: 1px solid var(--border-light);
-    border-radius: 3px; padding: 4px 6px; outline: none; color: var(--ink);
-  }
-  @keyframes rollPop { 0%{transform:scale(0.6) rotate(-10deg);opacity:0} 60%{transform:scale(1.15) rotate(3deg)} 100%{transform:scale(1) rotate(0);opacity:1} }
-  .roll-pop { animation: rollPop 0.3s ease forwards; }
-
   .passive-box {
     text-align: center; border: 2px solid var(--border); border-radius: 5px;
     padding: 8px; background: var(--parchment-mid);
@@ -484,7 +423,6 @@
       <button class="tab" onclick="switchTab('spells',this)">Spells</button>
       <button class="tab" onclick="switchTab('bio',this)">Biography</button>
       <button class="tab" onclick="switchTab('notes',this)">Notes</button>
-      <button class="tab" onclick="switchTab('dice',this)">🎲 Dice</button>
     </div>
 
     <!-- TAB: STATS -->
@@ -526,23 +464,10 @@
           </div>
           <div class="section">
             <div class="section-title">Inspiration</div>
-            <div class="section-body" style="display:flex;flex-direction:column;gap:10px">
+            <div class="section-body">
               <div class="inspiration-box" id="inspirationBox" onclick="toggleInspiration()">
-                <div class="star" id="inspirationDieLabel">★ d6</div>
-                <label>Click to toggle</label>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap">
-                <span style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--faded)">Die:</span>
-                <select id="inspirationDie" onchange="updateInspirationLabel();autosave()"
-                  style="font-family:'Cinzel',serif;font-size:0.85rem;font-weight:600;
-                         background:var(--parchment-mid);border:1px solid var(--border-light);
-                         border-radius:3px;padding:4px 8px;color:var(--ink);outline:none;cursor:pointer">
-                  <option value="d4">d4</option>
-                  <option value="d6" selected>d6</option>
-                  <option value="d8">d8</option>
-                  <option value="d10">d10</option>
-                  <option value="d12">d12</option>
-                </select>
+                <div class="star">★</div>
+                <label>Inspiration</label>
               </div>
             </div>
           </div>
@@ -752,70 +677,6 @@
       </div>
     </div>
 
-    <!-- TAB: DICE -->
-    <div id="tab-dice" class="tab-pane">
-      <div class="dice-tab">
-        <!-- Controls -->
-        <div style="margin-bottom:20px">
-          <div class="section">
-            <div class="section-title">Roll Modifier</div>
-            <div class="section-body">
-              <div class="modifier-row">
-                <label>Flat Modifier</label>
-                <input type="number" id="diceModifier" value="0" placeholder="0">
-                <span style="font-family:'Cinzel',serif;font-size:0.75rem;color:var(--faded)">(added to every roll)</span>
-              </div>
-            </div>
-          </div>
-          <div id="luckySection" style="display:none"></div>
-        </div>
-
-        <!-- Dice buttons -->
-        <div class="section" style="margin-bottom:20px">
-          <div class="section-title">Choose a Die</div>
-          <div class="section-body">
-            <div class="dice-grid" id="diceGrid">
-              <button class="die-btn" data-sides="4" onclick="rollDie(4)"><span class="die-icon">◆</span>d4</button>
-              <button class="die-btn" data-sides="6" onclick="rollDie(6)"><span class="die-icon">⬡</span>d6</button>
-              <button class="die-btn" data-sides="8" onclick="rollDie(8)"><span class="die-icon">◈</span>d8</button>
-              <button class="die-btn" data-sides="10" onclick="rollDie(10)"><span class="die-icon">◉</span>d10</button>
-              <button class="die-btn" data-sides="12" onclick="rollDie(12)"><span class="die-icon">✦</span>d12</button>
-              <button class="die-btn" data-sides="20" onclick="rollDie(20)"><span class="die-icon">⬟</span>d20</button>
-              <button class="die-btn" data-sides="100" onclick="rollDie(100)"><span class="die-icon">⊕</span>d100</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Result -->
-        <div class="grid-2" style="gap:16px">
-          <div>
-            <div class="section">
-              <div class="section-title">Result</div>
-              <div class="section-body">
-                <div class="roll-result">
-                  <div class="roll-number" id="rollDisplay">—</div>
-                  <div class="roll-label" id="rollLabel">Roll a die to begin</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="section">
-              <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;padding-right:10px">
-                <span>History</span>
-                <button onclick="clearHistory()" style="font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;background:transparent;border:1px solid rgba(245,230,200,0.3);color:rgba(245,230,200,0.6);padding:2px 8px;border-radius:2px;cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='var(--parchment)';this.style.borderColor='var(--parchment)'" onmouseout="this.style.color='rgba(245,230,200,0.6)';this.style.borderColor='rgba(245,230,200,0.3)'">Clear</button>
-              </div>
-              <div class="section-body">
-                <div class="roll-history" id="rollHistory">
-                  <div style="text-align:center;color:var(--faded);font-style:italic;font-size:0.9rem;padding:16px">No rolls yet</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- TAB: NOTES -->
     <div id="tab-notes" class="tab-pane sheet-body">
       <div class="grid-2">
@@ -858,22 +719,19 @@
 // ─── State ───────────────────────────────────────────────────────────────────
 const ABILITY_SCORES = ['Strength','Dexterity','Constitution','Intelligence','Wisdom','Charisma'];
 const ABILITY_ABBR = ['STR','DEX','CON','INT','WIS','CHA'];
-let SKILLS_LIST = [
+const SKILLS_LIST = [
   {name:'Acrobatics', attr:'DEX'},{name:'Animal Handling', attr:'WIS'},
   {name:'Arcana', attr:'INT'},{name:'Athletics', attr:'STR'},
   {name:'Deception', attr:'CHA'},{name:'History', attr:'INT'},
-  {name:'Insight', attr:'WIS'},{name:'Intimidation', attr:'CHA', toggleable:true},
+  {name:'Insight', attr:'WIS'},{name:'Intimidation', attr:'CHA'},
   {name:'Investigation', attr:'INT'},{name:'Medicine', attr:'WIS'},
   {name:'Nature', attr:'INT'},{name:'Perception', attr:'WIS'},
   {name:'Performance', attr:'CHA'},{name:'Persuasion', attr:'CHA'},
   {name:'Religion', attr:'INT'},{name:'Sleight of Hand', attr:'DEX'},
   {name:'Stealth', attr:'DEX'},{name:'Survival', attr:'WIS'}
 ];
-// Track Intimidation attr: 'CHA' or 'STR'
-let intimidationAttr = 'CHA';
 const SPELL_LEVELS = ['Cantrips','1st','2nd','3rd','4th','5th','6th','7th','8th','9th'];
-// Default max slots per level (index 0 = cantrips, no slots)
-let MAX_SLOTS = [0,4,3,3,3,3,2,2,1,1];
+const MAX_SLOTS = [0,4,3,3,3,3,2,2,1,1];
 
 let currentId = null;
 let saveTimer = null;
@@ -894,17 +752,18 @@ document.addEventListener('DOMContentLoaded', () => {
 // ─── Build UI Components ─────────────────────────────────────────────────────
 function buildAbilityScores() {
   const grid = document.getElementById('stats-grid');
-  grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%';
-  grid.innerHTML = ABILITY_SCORES.map((name, i) => {
+  grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px';
+  ABILITY_SCORES.forEach((name, i) => {
     const abbr = ABILITY_ABBR[i];
-    return `<div class="stat-box">
+    grid.innerHTML += `
+      <div class="stat-box">
         <label>${name}</label>
         <input class="score-input" type="number" id="score_${abbr}" value="10" min="1" max="30"
           oninput="updateAll();autosave()" placeholder="10">
         <div class="modifier" id="mod_${abbr}">+0</div>
         <div class="stat-label-tag">${abbr}</div>
       </div>`;
-  }).join('');
+  });
 }
 
 function buildSavingThrows() {
@@ -921,27 +780,13 @@ function buildSavingThrows() {
 
 function buildSkills() {
   const list = document.getElementById('skills-list');
-  list.innerHTML = SKILLS_LIST.map((s, i) => {
-    const attrDisplay = s.toggleable
-      ? `<span class="skill-attr-toggle" id="intim_toggle" onclick="toggleIntimidation()" title="Click to switch between CHA and STR">${s.attr} ⇄</span>`
-      : `<span class="skill-attr">${s.attr}</span>`;
-    return `<div class="skill-row">
+  list.innerHTML = SKILLS_LIST.map((s, i) => `
+    <div class="skill-row">
       <div class="skill-check prof-toggle" id="skill_prof_${i}" onclick="toggleSkillProf(${i})"></div>
       <span class="skill-bonus" id="skill_bonus_${i}">+0</span>
       <span class="skill-name">${s.name}</span>
-      ${attrDisplay}
-    </div>`;
-  }).join('');
-}
-
-function toggleIntimidation() {
-  const intimidIdx = SKILLS_LIST.findIndex(s => s.toggleable);
-  intimidationAttr = intimidationAttr === 'CHA' ? 'STR' : 'CHA';
-  SKILLS_LIST[intimidIdx].attr = intimidationAttr;
-  const toggle = document.getElementById('intim_toggle');
-  if(toggle) toggle.textContent = intimidationAttr + ' ⇄';
-  updateAll();
-  autosave();
+      <span class="skill-attr">${s.attr}</span>
+    </div>`).join('');
 }
 
 function buildDeathSaves() {
@@ -976,18 +821,10 @@ function buildSpellLevels() {
   container.innerHTML = '';
   SPELL_LEVELS.forEach((level, idx) => {
     const slotCount = MAX_SLOTS[idx];
-    const slotsEditor = idx === 0 ? '' : `
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
-        <span style="font-family:'Cinzel',serif;font-size:0.65rem;color:var(--faded);text-transform:uppercase;letter-spacing:0.08em;flex-shrink:0">Max Slots:</span>
-        <input type="number" id="maxslot_${idx}" value="${slotCount}" min="0" max="9"
-          style="font-family:'Cinzel',serif;font-size:0.9rem;font-weight:700;width:50px;text-align:center;
-                 background:var(--parchment-mid);border:1px solid var(--border-light);border-radius:3px;
-                 padding:3px 4px;outline:none;color:var(--ink)"
-          oninput="updateSlotPips(${idx}); autosave()">
-        <span style="font-family:'Cinzel',serif;font-size:0.65rem;color:var(--faded);text-transform:uppercase;letter-spacing:0.08em;flex-shrink:0">Used:</span>
-        <div id="slot_pips_${idx}" style="display:flex;gap:6px;flex-wrap:wrap">
-          ${Array.from({length:slotCount},(_,j)=>`<div class="slot-pip" id="slot_${idx}_${j}" onclick="toggleSlot(${idx},${j})"></div>`).join('')}
-        </div>
+    const slots = idx === 0 ? '' : `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+        <span style="font-family:'Cinzel',serif;font-size:0.65rem;color:var(--faded);text-transform:uppercase;letter-spacing:0.08em">Slots:</span>
+        ${Array.from({length:slotCount},(_,j)=>`<div class="slot-pip" id="slot_${idx}_${j}" onclick="toggleSlot(${idx},${j})"></div>`).join('')}
       </div>`;
     container.innerHTML += `
       <div class="section" style="margin-bottom:14px">
@@ -996,23 +833,11 @@ function buildSpellLevels() {
           ${level} Level Spells
         </div>
         <div class="section-body">
-          ${slotsEditor}
+          ${slots}
           <textarea id="spells_${idx}" rows="${idx===0?4:5}" placeholder="${idx===0?'Cantrips (at-will)...':'Level '+idx+' spells...'}" oninput="autosave()"></textarea>
         </div>
       </div>`;
   });
-}
-
-function updateSlotPips(lvl) {
-  const input = document.getElementById('maxslot_'+lvl);
-  const newCount = Math.max(0, Math.min(9, parseInt(input.value)||0));
-  input.value = newCount;
-  MAX_SLOTS[lvl] = newCount;
-  // Remember which slots were used before rebuild
-  const prevUsed = Array.from({length:9},(_,j) => document.getElementById('slot_'+lvl+'_'+j)?.classList.contains('used'));
-  const container = document.getElementById('slot_pips_'+lvl);
-  container.innerHTML = Array.from({length:newCount},(_,j)=>`
-    <div class="slot-pip${prevUsed[j]?' used':''}" id="slot_${lvl}_${j}" onclick="toggleSlot(${lvl},${j})"></div>`).join('');
 }
 
 // ─── Calculations ─────────────────────────────────────────────────────────────
@@ -1072,11 +897,6 @@ function toggleInspiration() {
   document.getElementById('inspirationBox')?.classList.toggle('active', inspiration);
   autosave();
 }
-function updateInspirationLabel() {
-  const die = document.getElementById('inspirationDie')?.value || 'd6';
-  const label = document.getElementById('inspirationDieLabel');
-  if(label) label.textContent = '★ ' + die;
-}
 function toggleDeath(type, idx) {
   const id = type==='success' ? 'ds_' : 'df_';
   const cls = type==='success' ? 'success-filled' : 'failure-filled';
@@ -1117,7 +937,7 @@ function getCharacterData() {
    'age','height','weight','eyes','skin','hair',
    'allies','backstory','sessionNotes','treasure',
    'additionalFeatures','npcNotes',
-   'cp','sp','ep','gp','pp','inspirationDie'
+   'cp','sp','ep','gp','pp'
   ].forEach(id => {
     const el = document.getElementById(id);
     if(el) data[id] = el.value;
@@ -1148,13 +968,10 @@ function getCharacterData() {
   data.deathSuccess = [0,1,2].map(i => document.getElementById('ds_'+i)?.classList.contains('success-filled'));
   data.deathFail = [0,1,2].map(i => document.getElementById('df_'+i)?.classList.contains('failure-filled'));
 
-  data.intimidationAttr = intimidationAttr;
   // Spell slots
   data.spellSlots = {};
-  data.maxSlots = {};
   SPELL_LEVELS.forEach((_,lvl) => {
     if(lvl===0) return;
-    data.maxSlots[lvl] = MAX_SLOTS[lvl];
     data.spellSlots[lvl] = Array.from({length:MAX_SLOTS[lvl]},(_,j) => document.getElementById('slot_'+lvl+'_'+j)?.classList.contains('used'));
   });
 
@@ -1214,28 +1031,12 @@ function applyCharacterData(data) {
   // Inspiration
   inspiration = !!data.inspiration;
   document.getElementById('inspirationBox')?.classList.toggle('active', inspiration);
-  updateInspirationLabel();
 
   // Death saves
   (data.deathSuccess||[]).forEach((v,i) => document.getElementById('ds_'+i)?.classList.toggle('success-filled',!!v));
   (data.deathFail||[]).forEach((v,i) => document.getElementById('df_'+i)?.classList.toggle('failure-filled',!!v));
 
-  // Restore intimidation attr
-  if(data.intimidationAttr) {
-    intimidationAttr = data.intimidationAttr;
-    const intimidIdx = SKILLS_LIST.findIndex(s => s.toggleable);
-    if(intimidIdx !== -1) SKILLS_LIST[intimidIdx].attr = intimidationAttr;
-    const toggle = document.getElementById('intim_toggle');
-    if(toggle) toggle.textContent = intimidationAttr + ' ⇄';
-  }
-  // Spell slots — restore max counts first, then used state
-  if(data.maxSlots) {
-    Object.entries(data.maxSlots).forEach(([lvl, count]) => {
-      MAX_SLOTS[parseInt(lvl)] = count;
-      const input = document.getElementById('maxslot_'+lvl);
-      if(input) { input.value = count; updateSlotPips(parseInt(lvl)); }
-    });
-  }
+  // Spell slots
   if(data.spellSlots) {
     Object.entries(data.spellSlots).forEach(([lvl, slots]) => {
       (slots||[]).forEach((used, j) => document.getElementById('slot_'+lvl+'_'+j)?.classList.toggle('used',!!used));
@@ -1330,25 +1131,14 @@ function resetSheet() {
   ABILITY_ABBR.forEach(a => document.getElementById('save_prof_'+a)?.classList.remove('proficient'));
   inspiration = false;
   document.getElementById('inspirationBox')?.classList.remove('active');
-  const dieEl = document.getElementById('inspirationDie'); if(dieEl) dieEl.value='d6';
-  updateInspirationLabel();
   [0,1,2].forEach(i => {
     document.getElementById('ds_'+i)?.classList.remove('success-filled');
     document.getElementById('df_'+i)?.classList.remove('failure-filled');
   });
-  intimidationAttr = 'CHA';
-  const intimidIdx2 = SKILLS_LIST.findIndex(s => s.toggleable);
-  if(intimidIdx2 !== -1) SKILLS_LIST[intimidIdx2].attr = 'CHA';
-  const it = document.getElementById('intim_toggle'); if(it) it.textContent = 'CHA ⇄';
-  // Reset spell slots
-  MAX_SLOTS = [0,4,3,3,3,2,2,1,1,1];
   SPELL_LEVELS.forEach((_,lvl) => {
     const e = document.getElementById('spells_'+lvl);
     if(e) e.value = '';
-    if(lvl>0) {
-      const input = document.getElementById('maxslot_'+lvl);
-      if(input) { input.value = MAX_SLOTS[lvl]; updateSlotPips(lvl); }
-    }
+    if(lvl>0) Array.from({length:MAX_SLOTS[lvl]},(_,j) => document.getElementById('slot_'+lvl+'_'+j)?.classList.remove('used'));
   });
   const list = document.getElementById('attacks-list');
   list.innerHTML = '';
@@ -1409,102 +1199,6 @@ function showSaved() {
   const el = document.getElementById('save-status');
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 1800);
-}
-
-// ─── Dice Roller ─────────────────────────────────────────────────────────────
-let luckyMode = false;
-let rollHistoryArr = [];
-
-function rollDie(sides) {
-  const modifier = parseInt(document.getElementById('diceModifier')?.value) || 0;
-  let raw;
-  if(luckyMode) {
-    // Top 25% of range: ceil(0.75 * sides) up to sides
-    const minVal = Math.max(1, Math.ceil(0.75 * sides));
-    raw = minVal + Math.floor(Math.random() * (sides - minVal + 1));
-  } else {
-    raw = 1 + Math.floor(Math.random() * sides);
-  }
-  const total = raw + modifier;
-
-  const display = document.getElementById('rollDisplay');
-  const label = document.getElementById('rollLabel');
-  if(display) {
-    display.textContent = total;
-    display.className = 'roll-number';
-    if(raw === sides && sides > 1) display.classList.add('crit');
-    else if(raw === 1) display.classList.add('fumble');
-    display.classList.remove('roll-pop');
-    void display.offsetWidth;
-    display.classList.add('roll-pop');
-  }
-  let desc = 'd' + sides;
-  if(raw === sides && sides > 1) desc += ' — CRIT! ✦';
-  else if(raw === 1) desc += ' — Fumble ✗';
-  if(modifier !== 0) desc += ' (' + raw + ' ' + (modifier >= 0 ? '+' : '') + modifier + ')';
-  if(label) label.textContent = desc;
-
-  rollHistoryArr.unshift({sides, raw, total, modifier});
-  if(rollHistoryArr.length > 30) rollHistoryArr.pop();
-  renderHistory();
-}
-
-function clearHistory() {
-  rollHistoryArr = [];
-  renderHistory();
-}
-
-function renderHistory() {
-  const el = document.getElementById('rollHistory');
-  if(!el) return;
-  if(!rollHistoryArr.length) { el.innerHTML = '<div style="text-align:center;color:var(--faded);font-style:italic;font-size:0.9rem;padding:16px">No rolls yet</div>'; return; }
-  el.innerHTML = rollHistoryArr.map(r =>
-    '<div class="roll-history-item">' +
-    '<span class="rh-die">d' + r.sides + '</span>' +
-    '<span class="rh-val">' + r.total + (r.modifier!==0?' ('+r.raw+(r.modifier>=0?'+':'')+r.modifier+')':'') + '</span>' +
-    '</div>').join('');
-}
-
-// ── Lucky Mode ───────────────────────────────────────────────────────────────
-// ON:  click d4 → d6 → d8 in sequence within 1.5s
-// OFF: click d8 → d6 → d4 in sequence within 1.5s
-let _lseq = []; // {sides, time}
-const _ON  = [10, 20, 100];
-const _OFF = [100, 20, 10];
-function _ltrack(sides) {
-  const now = Date.now();
-  _lseq.push({sides, now});
-  _lseq = _lseq.filter(e => now - e.now < 1500);
-  if(_lseq.length > 3) _lseq = _lseq.slice(-3);
-  const seq = _lseq.map(e => e.sides);
-  if(seq.length === 3) {
-    if(!luckyMode && seq[0]===10 && seq[1]===20 && seq[2]===100) {
-      _lseq = []; enableLucky();
-    } else if(luckyMode && seq[0]===100 && seq[1]===20 && seq[2]===10) {
-      _lseq = []; disableLucky();
-    }
-  }
-}
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.die-btn').forEach(b => {
-    const sides = parseInt(b.getAttribute('data-sides'));
-    if(sides) b.addEventListener('click', () => _ltrack(sides));
-  });
-});
-
-function enableLucky() {
-  luckyMode = true;
-  document.querySelectorAll('.die-btn').forEach(b => {
-    b.classList.add('lucky-active');
-    b.style.boxShadow = 'inset 0 0 8px rgba(184,134,11,0.18)';
-  });
-}
-function disableLucky() {
-  luckyMode = false;
-  document.querySelectorAll('.die-btn').forEach(b => {
-    b.classList.remove('lucky-active');
-    b.style.boxShadow = '';
-  });
 }
 
 // ─── Tab switching ────────────────────────────────────────────────────────────
