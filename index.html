@@ -2136,4 +2136,460 @@ function addInitEntry() {
 }
 
 function sortInitiative() {
-  dmInitiative.so
+  dmInitiative.sort((a,b)=>b.init-a.init);
+  currentTurn=0; renderInitList(); dmAutosave();
+}
+
+function nextTurn() {
+  if(!dmInitiative.length) return;
+  currentTurn = (currentTurn+1) % dmInitiative.length;
+  renderInitList();
+}
+
+function clearInitiative() {
+  if(!confirm('Clear all initiative entries?')) return;
+  dmInitiative=[]; currentTurn=0; renderInitList(); dmAutosave();
+}
+
+function removeInitEntry(idx) {
+  dmInitiative.splice(idx,1);
+  if(currentTurn >= dmInitiative.length) currentTurn=0;
+  renderInitList(); dmAutosave();
+}
+
+function updateInitHP(idx, val) {
+  if(dmInitiative[idx]) { dmInitiative[idx].hp=parseInt(val)||0; dmAutosave(); }
+}
+
+function getInitData() { return {list: dmInitiative, turn: currentTurn}; }
+
+function hpBarColor(hp, maxHp) {
+  if(maxHp <= 0) return '#555';
+  if(hp > maxHp) return '#1a6bbf'; // over max = blue (temp hp)
+  const pct = hp / maxHp;
+  if(pct > 0.667) return '#2d7a2d'; // top third = green
+  if(pct > 0.333) return '#b8860b'; // middle third = yellow/gold
+  return '#7a0a0a';                  // bottom third = dark red
+}
+
+function hpBarWidth(hp, maxHp) {
+  if(maxHp <= 0) return 0;
+  if(hp > maxHp) return 100; // over max fills bar (shown in blue)
+  return Math.max(0, Math.min(100, (hp / maxHp) * 100));
+}
+
+function renderInitList() {
+  const el = document.getElementById('init-list');
+  if(!el) return;
+  if(!dmInitiative.length) { el.innerHTML='<div style="text-align:center;color:var(--faded);font-style:italic;padding:16px">No combatants yet</div>'; return; }
+  el.innerHTML = dmInitiative.map((e,i)=>{
+    const isActive = i===currentTurn;
+    const color = hpBarColor(e.hp, e.maxHp);
+    const width = hpBarWidth(e.hp, e.maxHp);
+    const hpLabel = e.hp > e.maxHp ? e.hp + ' ✦' : e.hp; // mark temp hp
+    return `<div class="init-row${isActive?' current-turn':''}">
+      <input class="init-input" value="${e.init}" onchange="dmInitiative[${i}].init=parseInt(this.value)||0;dmAutosave()" title="Initiative">
+      <div>
+        <div class="init-name">${e.name}${isActive?' ◀':''}</div>
+        <div class="hp-bar-wrap"><div class="hp-bar-fill" style="width:${width}%;background:${color}"></div></div>
+      </div>
+      <input class="init-input" type="number" value="${e.hp}" onchange="updateInitHP(${i},this.value);renderInitList()" title="Current HP" style="font-size:0.85rem;color:${color}">
+      <div class="init-hp" style="padding-top:4px;color:var(--faded)">${e.maxHp}</div>
+      <button class="monster-del-btn" onclick="removeInitEntry(${i})">✕</button>
+    </div>`;
+  }).join('');
+}
+
+// ── Monster Stat Blocks ──────────────────────────────────────────────────────
+let dmMonsters = [];
+
+function addMonster(data) {
+  dmMonsters.push(data || {
+    id: Date.now(), name:'New Monster', type:'Medium humanoid', cr:'1',
+    ac:'12', hp:'16', speed:'30 ft.',
+    str:'10',dex:'10',con:'10',int:'10',wis:'10',cha:'10',
+    saves:'', skills:'', senses:'darkvision 60 ft.', languages:'Common',
+    traits:'', actions:'', legendaryActions:'', reactions:'', notes:''
+  });
+  renderMonsterList(); dmAutosave();
+}
+
+function removeMonster(idx) {
+  dmMonsters.splice(idx,1); renderMonsterList(); dmAutosave();
+}
+
+function getMonsterData() {
+  // Collect live values from DOM
+  dmMonsters.forEach((m,i) => {
+    const g = id => document.getElementById('m_'+i+'_'+id)?.value||'';
+    m.name=g('name')||m.name; m.type=g('type'); m.cr=g('cr');
+    m.ac=g('ac'); m.hp=g('hp'); m.speed=g('speed');
+    ['str','dex','con','int','wis','cha'].forEach(a=>m[a]=g(a));
+    m.saves=g('saves'); m.skills=g('skills'); m.senses=g('senses');
+    m.languages=g('languages'); m.traits=g('traits'); m.actions=g('actions');
+    m.legendaryActions=g('legendary'); m.reactions=g('reactions'); m.notes=g('notes');
+  });
+  return dmMonsters;
+}
+
+function renderMonsterList() {
+  const el = document.getElementById('monsters-list');
+  if(!el) return;
+  if(!dmMonsters.length) { el.innerHTML='<div style="text-align:center;color:var(--faded);font-style:italic;padding:24px">No monsters yet — add one above</div>'; return; }
+  el.innerHTML = dmMonsters.map((m,i)=>{
+    const collapsed = m._collapsed;
+    return `<div class="monster-card" draggable="true" data-type="monster" data-idx="${i}"
+        ondragstart="cardDragStart(event,'monster',${i})" ondragover="cardDragOver(event)" ondrop="cardDrop(event,'monster',${i})" ondragleave="cardDragLeave(event)">
+      <div class="monster-header" style="cursor:default">
+        <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+          <span class="card-handle" title="Drag to reorder">⠿</span>
+          <button class="card-collapse-btn ${collapsed?'closed':'open'}" onclick="toggleCollapse('monster',${i})" title="${collapsed?'Expand':'Collapse'}">▼</button>
+          <div style="min-width:0">
+            <h3><input value="${m.name}" id="m_${i}_name" onchange="dmMonsters[${i}].name=this.value;renderMonsterList();dmAutosave()"
+              style="background:transparent;border:none;outline:none;color:var(--parchment);font-family:'Cinzel',serif;font-size:1rem;font-weight:700;width:180px;max-width:100%"></h3>
+            ${!collapsed?`<div class="monster-type"><input value="${m.type}" id="m_${i}_type" onchange="dmMonsters[${i}].type=this.value;dmAutosave()"
+              style="background:transparent;border:none;outline:none;color:rgba(245,230,200,0.75);font-family:'Crimson Text',serif;font-style:italic;font-size:0.9rem;width:200px"></div>`:''}
+          </div>
+        </div>
+        <button class="monster-del-btn" onclick="removeMonster(${i})">✕ Remove</button>
+      </div>
+      <div class="card-collapsible-body" style="max-height:${collapsed?'0':'9999px'};${collapsed?'overflow:hidden':''}">
+        <div class="monster-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+            <div class="monster-field"><label>Armor Class</label><input id="m_${i}_ac" value="${m.ac}" oninput="dmAutosave()"></div>
+            <div class="monster-field"><label>Hit Points</label><input id="m_${i}_hp" value="${m.hp}" oninput="dmAutosave()"></div>
+            <div class="monster-field"><label>Speed</label><input id="m_${i}_speed" value="${m.speed}" oninput="dmAutosave()"></div>
+            <div class="monster-field"><label>Challenge Rating</label><input id="m_${i}_cr" value="${m.cr}" oninput="dmAutosave()"></div>
+          </div>
+          <div class="monster-stats">
+            ${['str','dex','con','int','wis','cha'].map(a=>`
+            <div class="monster-stat">
+              <label>${a.toUpperCase()}</label>
+              <input id="m_${i}_${a}" value="${m[a]||10}" type="number" oninput="dmAutosave()">
+              <div style="font-family:'Cinzel',serif;font-size:0.75rem;color:var(--red)">${fmtMod(getMod(parseInt(m[a])||10))}</div>
+            </div>`).join('')}
+          </div>
+          <div class="grid-2" style="gap:10px;margin-bottom:10px">
+            <div class="monster-field"><label>Saving Throws</label><input id="m_${i}_saves" value="${m.saves}" placeholder="Dex +4, Wis +2" oninput="dmAutosave()"></div>
+            <div class="monster-field"><label>Skills</label><input id="m_${i}_skills" value="${m.skills}" placeholder="Perception +4" oninput="dmAutosave()"></div>
+            <div class="monster-field"><label>Senses</label><input id="m_${i}_senses" value="${m.senses}" oninput="dmAutosave()"></div>
+            <div class="monster-field"><label>Languages</label><input id="m_${i}_languages" value="${m.languages}" oninput="dmAutosave()"></div>
+          </div>
+          <div class="monster-field"><label>Traits / Special Abilities</label><textarea id="m_${i}_traits" rows="3" oninput="dmAutosave()">${m.traits||''}</textarea></div>
+          <div class="monster-field"><label>Actions</label><textarea id="m_${i}_actions" rows="4" oninput="dmAutosave()">${m.actions||''}</textarea></div>
+          <div class="grid-2" style="gap:10px">
+            <div class="monster-field"><label>Reactions</label><textarea id="m_${i}_reactions" rows="2" oninput="dmAutosave()">${m.reactions||''}</textarea></div>
+            <div class="monster-field"><label>Legendary Actions</label><textarea id="m_${i}_legendary" rows="2" oninput="dmAutosave()">${m.legendaryActions||''}</textarea></div>
+          </div>
+          <div class="monster-field"><label>DM Notes</label><textarea id="m_${i}_notes" rows="2" oninput="dmAutosave()">${m.notes||''}</textarea></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── NPCs ─────────────────────────────────────────────────────────────────────
+let dmNPCs = [];
+
+function addNPC(data) {
+  dmNPCs.push(data || {id:Date.now(), name:'New NPC', role:'', location:'', attitude:'Neutral', description:'', motivation:'', secret:'', notes:''});
+  renderNPCList(); dmAutosave();
+}
+
+function removeNPC(idx) { dmNPCs.splice(idx,1); renderNPCList(); dmAutosave(); }
+
+function getNPCData() {
+  dmNPCs.forEach((n,i)=>{
+    const g=id=>document.getElementById('npc_'+i+'_'+id)?.value||'';
+    n.name=g('name'); n.role=g('role'); n.location=g('location');
+    n.attitude=g('attitude'); n.description=g('description');
+    n.motivation=g('motivation'); n.secret=g('secret'); n.notes=g('notes');
+  });
+  return dmNPCs;
+}
+
+function renderNPCList() {
+  const el = document.getElementById('npcs-list');
+  if(!el) return;
+  if(!dmNPCs.length) { el.innerHTML='<div style="text-align:center;color:var(--faded);font-style:italic;padding:24px">No NPCs yet</div>'; return; }
+  const attColors = {Friendly:'#2d6a2d',Neutral:'' ,Hostile:'#7a0a0a',Unknown:'#555'};
+  el.innerHTML = dmNPCs.map((n,i)=>{
+    const collapsed = n._collapsed;
+    return `<div class="npc-card" draggable="true" data-type="npc" data-idx="${i}"
+        ondragstart="cardDragStart(event,'npc',${i})" ondragover="cardDragOver(event)" ondrop="cardDrop(event,'npc',${i})" ondragleave="cardDragLeave(event)">
+      <div class="npc-card-header">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex:1;min-width:0">
+          <span class="card-handle" title="Drag to reorder">⠿</span>
+          <button class="card-collapse-btn ${collapsed?'closed':'open'}" onclick="toggleCollapse('npc',${i})"  title="${collapsed?'Expand':'Collapse'}">▼</button>
+          <input value="${n.name}" id="npc_${i}_name" onchange="dmNPCs[${i}].name=this.value;dmAutosave()"
+            style="font-family:'Cinzel',serif;font-size:1rem;font-weight:700;background:transparent;border:none;border-bottom:1px dashed var(--border-light);outline:none;color:var(--ink)">
+          <span style="font-family:'Cinzel',serif;font-size:0.7rem;padding:2px 8px;border-radius:10px;border:1px solid currentColor;color:${attColors[n.attitude]||'var(--faded)'}">${n.attitude||'Neutral'}</span>
+        </div>
+        <button class="monster-del-btn" style="background:rgba(139,26,26,0.12);border:1px solid var(--red);color:var(--red);padding:4px 10px" onclick="removeNPC(${i})">✕</button>
+      </div>
+      <div class="card-collapsible-body" style="max-height:${collapsed?'0':'9999px'};${collapsed?'overflow:hidden':''}">
+        <div style="padding:0 4px 8px">
+          <div style="margin-bottom:8px;padding-top:8px">
+            <select id="npc_${i}_attitude" onchange="dmNPCs[${i}].attitude=this.value;renderNPCList();dmAutosave()"
+              style="font-family:'Crimson Text',serif;font-size:0.85rem;background:var(--parchment);border:1px solid var(--border-light);border-radius:3px;padding:2px 6px;color:var(--ink)">
+              ${['Friendly','Neutral','Hostile','Unknown'].map(a=>`<option${n.attitude===a?' selected':''}>${a}</option>`).join('')}
+            </select>
+          </div>
+          <div class="grid-2" style="gap:10px;margin-bottom:8px">
+            <div class="monster-field"><label>Role / Title</label><input id="npc_${i}_role" value="${n.role}" placeholder="Blacksmith, Guard Captain..." oninput="dmAutosave()"></div>
+            <div class="monster-field"><label>Location</label><input id="npc_${i}_location" value="${n.location}" placeholder="Riverdale Tavern..." oninput="dmAutosave()"></div>
+          </div>
+          <div class="monster-field"><label>Description</label><textarea id="npc_${i}_description" rows="2" oninput="dmAutosave()">${n.description||''}</textarea></div>
+          <div class="grid-2" style="gap:10px">
+            <div class="monster-field"><label>Motivation / Goal</label><textarea id="npc_${i}_motivation" rows="2" oninput="dmAutosave()">${n.motivation||''}</textarea></div>
+            <div class="monster-field"><label>Secret (DM Only)</label><textarea id="npc_${i}_secret" rows="2" oninput="dmAutosave()">${n.secret||''}</textarea></div>
+          </div>
+          <div class="monster-field"><label>Notes</label><textarea id="npc_${i}_notes" rows="2" oninput="dmAutosave()">${n.notes||''}</textarea></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Locations ────────────────────────────────────────────────────────────────
+let dmLocations = [];
+
+function addLocation(data) {
+  dmLocations.push(data||{id:Date.now(), name:'New Location', type:'', region:'', description:'', secrets:'', npcs:'', encounters:'', notes:''});
+  renderLocationList(); dmAutosave();
+}
+
+function removeLocation(idx) { dmLocations.splice(idx,1); renderLocationList(); dmAutosave(); }
+
+function getLocationData() {
+  dmLocations.forEach((l,i)=>{
+    const g=id=>document.getElementById('loc_'+i+'_'+id)?.value||'';
+    l.name=g('name'); l.type=g('type'); l.region=g('region');
+    l.description=g('description'); l.secrets=g('secrets');
+    l.npcs=g('npcs'); l.encounters=g('encounters'); l.notes=g('notes');
+  });
+  return dmLocations;
+}
+
+function renderLocationList() {
+  const el = document.getElementById('locations-list');
+  if(!el) return;
+  if(!dmLocations.length) { el.innerHTML='<div style="text-align:center;color:var(--faded);font-style:italic;padding:24px">No locations yet</div>'; return; }
+  el.innerHTML = dmLocations.map((l,i)=>{
+    const collapsed = l._collapsed;
+    return `<div class="npc-card" draggable="true" data-type="location" data-idx="${i}"
+        ondragstart="cardDragStart(event,'location',${i})" ondragover="cardDragOver(event)" ondrop="cardDrop(event,'location',${i})" ondragleave="cardDragLeave(event)">
+      <div class="npc-card-header">
+        <div style="display:flex;gap:8px;align-items:center;flex:1;min-width:0">
+          <span class="card-handle" title="Drag to reorder">⠿</span>
+          <button class="card-collapse-btn ${collapsed?'closed':'open'}" onclick="toggleCollapse('location',${i})" title="${collapsed?'Expand':'Collapse'}">▼</button>
+          <input value="${l.name}" id="loc_${i}_name" onchange="dmLocations[${i}].name=this.value;dmAutosave()"
+            style="font-family:'Cinzel',serif;font-size:1rem;font-weight:700;background:transparent;border:none;border-bottom:1px dashed var(--border-light);outline:none;color:var(--ink)">
+          ${l.type?`<span style="font-family:'Cinzel',serif;font-size:0.65rem;color:var(--faded);font-style:italic">${l.type}</span>`:''}
+        </div>
+        <button class="monster-del-btn" style="background:rgba(139,26,26,0.12);border:1px solid var(--red);color:var(--red);padding:4px 10px" onclick="removeLocation(${i})">✕</button>
+      </div>
+      <div class="card-collapsible-body" style="max-height:${collapsed?'0':'9999px'};${collapsed?'overflow:hidden':''}">
+        <div style="padding:0 4px 8px">
+          <div class="grid-2" style="gap:10px;margin-bottom:8px;padding-top:8px">
+            <div class="monster-field"><label>Type</label><input id="loc_${i}_type" value="${l.type}" placeholder="Dungeon, City, Wilderness..." oninput="dmAutosave()"></div>
+            <div class="monster-field"><label>Region</label><input id="loc_${i}_region" value="${l.region}" placeholder="Sword Coast, Underdark..." oninput="dmAutosave()"></div>
+          </div>
+          <div class="monster-field"><label>Description</label><textarea id="loc_${i}_description" rows="3" oninput="dmAutosave()">${l.description||''}</textarea></div>
+          <div class="grid-2" style="gap:10px">
+            <div class="monster-field"><label>Secrets / Hidden Details</label><textarea id="loc_${i}_secrets" rows="2" oninput="dmAutosave()">${l.secrets||''}</textarea></div>
+            <div class="monster-field"><label>Notable NPCs Here</label><textarea id="loc_${i}_npcs" rows="2" oninput="dmAutosave()">${l.npcs||''}</textarea></div>
+          </div>
+          <div class="monster-field"><label>Possible Encounters</label><textarea id="loc_${i}_encounters" rows="2" oninput="dmAutosave()">${l.encounters||''}</textarea></div>
+          <div class="monster-field"><label>DM Notes</label><textarea id="loc_${i}_notes" rows="2" oninput="dmAutosave()">${l.notes||''}</textarea></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Loot Generator ───────────────────────────────────────────────────────────
+const LOOT_TABLES = {
+  low: {
+    coins: ()=> `${r(2,6)*10} CP, ${r(2,6)*5} SP, ${r(1,6)*2} GP`,
+    items: ['Potion of Healing','Scroll of level 1 spell','Mundane weapon (+0)','Artisan tools','Gem worth 10gp','Trinket (roll d100)','50 ft. rope','Torch x10','Rations x5']
+  },
+  mid: {
+    coins: ()=> `${r(4,6)*10} SP, ${r(2,6)*10} GP, ${r(1,4)} PP`,
+    items: ['Potion of Greater Healing','Scroll of level 2-3 spell','+1 weapon or armor','Bag of Holding','Gem worth 50gp','Cloak of Protection','Eyes of the Eagle','Wand of Magic Missiles','Pearl of Power']
+  },
+  high: {
+    coins: ()=> `${r(2,6)*100} GP, ${r(2,6)*10} PP`,
+    items: ['+2 weapon or armor','Potion of Superior Healing','Scroll of level 4-6 spell','Necklace of Adaptation','Ring of Evasion','Boots of Speed','Staff of the Python','Gem worth 500gp','Dimensional Shackles']
+  },
+  epic: {
+    coins: ()=> `${r(4,6)*1000} GP, ${r(2,6)*100} PP`,
+    items: ['+3 weapon or armor','Luck Blade','Vorpal Sword','Staff of the Magi','Robe of the Archmagi','Potion of Storm Giant Strength','Manual of Bodily Health','Crystal Ball','Tome of Clear Thought','Holy Avenger','Cloak of Invisibility']
+  }
+};
+function r(n,d){let t=0;for(let i=0;i<n;i++)t+=1+Math.floor(Math.random()*d);return t;}
+
+function generateLoot() {
+  const cr = document.getElementById('loot-cr')?.value || 'mid';
+  const table = LOOT_TABLES[cr];
+  const coins = table.coins();
+  const numItems = cr==='low'?r(1,2):cr==='mid'?r(1,3):cr==='high'?r(2,3):r(2,4);
+  const shuffled = [...table.items].sort(()=>Math.random()-0.5);
+  const items = shuffled.slice(0, numItems);
+  const el = document.getElementById('loot-result');
+  if(el) el.innerHTML = `<strong style="font-family:'Cinzel',serif;font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--red)">Currency:</strong><br>${coins}<br><br><strong style="font-family:'Cinzel',serif;font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--red)">Items:</strong><br>${items.map(i=>'• '+i).join('<br>')}`;
+}
+// ─── Tab switching ────────────────────────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+name)?.classList.add('active');
+  btn.classList.add('active');
+}
+
+
+// ── Collapse / Drag-to-Reorder ────────────────────────────────────────────────
+function toggleCollapse(type, idx) {
+  const arr = type==='monster'?dmMonsters:type==='npc'?dmNPCs:dmLocations;
+  const render = type==='monster'?renderMonsterList:type==='npc'?renderNPCList:renderLocationList;
+  // Flush live DOM values before toggling so we don't lose edits
+  if(type==='monster') getMonsterData();
+  else if(type==='npc') getNPCData();
+  else getLocationData();
+  arr[idx]._collapsed = !arr[idx]._collapsed;
+  render();
+  dmAutosave();
+}
+
+let _dragSrcType = null;
+let _dragSrcIdx  = null;
+
+function cardDragStart(e, type, idx) {
+  // Flush edits before reorder
+  if(type==='monster') getMonsterData();
+  else if(type==='npc') getNPCData();
+  else getLocationData();
+  _dragSrcType = type; _dragSrcIdx = idx;
+  e.currentTarget.classList.add('card-dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function cardDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('card-drag-over');
+}
+
+function cardDragLeave(e) {
+  e.currentTarget.classList.remove('card-drag-over');
+}
+
+function cardDrop(e, type, toIdx) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('card-drag-over');
+  if(_dragSrcType !== type || _dragSrcIdx === toIdx) return;
+  const arr = type==='monster'?dmMonsters:type==='npc'?dmNPCs:dmLocations;
+  const render = type==='monster'?renderMonsterList:type==='npc'?renderNPCList:renderLocationList;
+  const [moved] = arr.splice(_dragSrcIdx, 1);
+  arr.splice(toIdx, 0, moved);
+  _dragSrcIdx = null; _dragSrcType = null;
+  render(); dmAutosave();
+}
+
+// ── DM Monster Dice ──────────────────────────────────────────────────────────
+let dmRollHistoryArr = [];
+
+function dmRollDie(sides) {
+  const modifier = parseInt(document.getElementById('dmDiceModifier')?.value) || 0;
+  const raw = 1 + Math.floor(Math.random() * sides);
+  const total = raw + modifier;
+
+  const display = document.getElementById('dmRollDisplay');
+  const label   = document.getElementById('dmRollLabel');
+  if(display) {
+    display.textContent = total;
+    display.className = 'roll-number';
+    if(raw === sides && sides > 1) display.classList.add('crit');
+    else if(raw === 1) display.classList.add('fumble');
+    display.classList.remove('roll-pop');
+    void display.offsetWidth;
+    display.classList.add('roll-pop');
+  }
+  let desc = 'd' + sides;
+  if(raw === sides && sides > 1) desc += ' — CRIT! ✦';
+  else if(raw === 1) desc += ' — Fumble ✗';
+  if(modifier !== 0) desc += ' (' + raw + ' ' + (modifier >= 0 ? '+' : '') + modifier + ')';
+  if(label) label.textContent = desc;
+
+  dmRollHistoryArr.unshift({sides, raw, total, modifier, label: 'd'+sides});
+  if(dmRollHistoryArr.length > 30) dmRollHistoryArr.pop();
+  renderDMHistory();
+}
+
+function dmRollAbility(attr) {
+  // Look up selected monster's stat, use as modifier
+  const sel = document.getElementById('dmAbilityMonsterSelect');
+  const idx = sel ? parseInt(sel.value) : NaN;
+  let bonus = 0;
+  let monsterName = '';
+  if(!isNaN(idx) && dmMonsters[idx]) {
+    const score = parseInt(dmMonsters[idx][attr.toLowerCase()]) || 10;
+    bonus = getMod(score);
+    monsterName = dmMonsters[idx].name;
+  }
+  const extra = parseInt(document.getElementById('dmDiceModifier')?.value) || 0;
+  const raw = 1 + Math.floor(Math.random() * 20);
+  const total = raw + bonus + extra;
+
+  const display = document.getElementById('dmRollDisplay');
+  const label   = document.getElementById('dmRollLabel');
+  if(display) {
+    display.textContent = total;
+    display.className = 'roll-number';
+    if(raw === 20) display.classList.add('crit');
+    else if(raw === 1) display.classList.add('fumble');
+    display.classList.remove('roll-pop');
+    void display.offsetWidth;
+    display.classList.add('roll-pop');
+  }
+  let desc = 'd20 ' + attr + (bonus >= 0 ? ' +' : ' ') + bonus;
+  if(monsterName) desc += ' (' + monsterName + ')';
+  if(raw === 20) desc += ' — NAT 20! ✦';
+  else if(raw === 1) desc += ' — NAT 1 ✗';
+  if(label) label.textContent = desc;
+
+  dmRollHistoryArr.unshift({sides:20, raw, total, modifier: bonus+extra, label: attr+(monsterName?' ('+monsterName+')':'')});
+  if(dmRollHistoryArr.length > 30) dmRollHistoryArr.pop();
+  renderDMHistory();
+}
+
+function renderDMHistory() {
+  const el = document.getElementById('dmRollHistory');
+  if(!el) return;
+  if(!dmRollHistoryArr.length) {
+    el.innerHTML = '<div style="text-align:center;color:var(--faded);font-style:italic;font-size:0.9rem;padding:16px">No rolls yet</div>';
+    return;
+  }
+  el.innerHTML = dmRollHistoryArr.map(r =>
+    '<div class="roll-history-item">' +
+    '<span class="rh-die">' + (r.label||('d'+r.sides)) + '</span>' +
+    '<span class="rh-val">' + r.total + (r.modifier!==0?' ('+r.raw+(r.modifier>=0?'+':'')+r.modifier+')':'') + '</span>' +
+    '</div>').join('');
+}
+
+function clearDMHistory() {
+  dmRollHistoryArr = [];
+  renderDMHistory();
+}
+
+function refreshMonsterSelect() {
+  const sel = document.getElementById('dmAbilityMonsterSelect');
+  if(!sel) return;
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">— No monster selected —</option>' +
+    dmMonsters.map((m,i) => '<option value="'+i+'"'+(prev==i?' selected':'')+'>'+m.name+'</option>').join('');
+}
+
+</script>
+</body>
+  </html>
